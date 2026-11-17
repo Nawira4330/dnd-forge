@@ -468,7 +468,7 @@
 /* ---------- Online-Abgleich (nur in der Online-Version): localStorage <-> private Datenbank ---------- */
 (function(){
   "use strict";
-  const SYNC=/^dnd_(characters_v1|homebrew_v1|group_v1|bestiary_v1|people_v1|sessions_v1|books_v1|seeded_books|seeded_people|seeded_chars|seeded_fenn|seeded_itemsen|seeded_sheet1|seeded_sheet2|seeded_sheet3|seeded_sheet4|seeded_sheet5|seeded_sheet6|seeded_sheet7|seeded_sheet8|seeded_sheet9|seeded_sheet10|seeded_sheet11)$/;
+  const SYNC=/^dnd_(characters_v1|homebrew_v1|group_v1|bestiary_v1|people_v1|sessions_v1|books_v1|seeded_books|seeded_people|seeded_chars|seeded_fenn|seeded_itemsen|seeded_sheet1|seeded_sheet2|seeded_sheet3|seeded_sheet4|seeded_sheet5|seeded_sheet6|seeded_sheet7|seeded_sheet8|seeded_sheet9|seeded_sheet10|seeded_sheet11|seeded_sheet12)$/;
   const HASHK="dnd_sync_hash", META="dnd_sync_meta", DEVK="dnd_sync_dev", PEND="dnd_sync_pending", CHUNK=60000;
   const ls=window.localStorage;
   const rawSet=Storage.prototype.setItem, rawRemove=Storage.prototype.removeItem;
@@ -8399,7 +8399,7 @@ function saveBooks(){ try{ localStorage.setItem(BOOKS_KEY,JSON.stringify(BOOKS))
     BOOKS.books.unshift({id:uid(),title:"Qualfas Tagebuch",desc:"Alles zu Qualfas Tagebuch: Seiten, Zitate, Rätsel, Hinweise und Querverweise.",entries:[],ts:Date.now(),upd:Date.now()}); saveBooks(); }
 })();
 const BOOKS_UI={sel:"",q:"",tag:"",sort:"order",diary:false};
-(function dedupeBooksOnce(){ try{ if(localStorage.getItem("dnd_seeded_sheet11")) return; localStorage.setItem("dnd_seeded_sheet11","1"); }catch(e){ return; }
+(function dedupeBooksOnce(){ try{ if(localStorage.getItem("dnd_seeded_sheet12")) return; localStorage.setItem("dnd_seeded_sheet12","1"); }catch(e){ return; }
   let n=0; BOOKS.books.forEach(b=>{ n+=bookDedupe(b); }); if(n) saveBooks(); })();
 const isQualfa=b=>normTxt(b.title)==="qualfas tagebuch";
 const booksList=()=>BOOKS.books.filter(b=>isQualfa(b)===!!BOOKS_UI.diary);
@@ -8476,7 +8476,7 @@ function bookMergeInto(t,e){
 /* merges double entries of one book and removes paragraphs that are repeated inside a text; returns how many were fixed */
 function bookDedupe(b){
   const out=[]; let n=0;
-  (b.entries||[]).forEach(e=>{ const tf=bookTitleFix(e.title); if(tf!==(e.title||"")){ e.title=tf; n++; } });
+  (b.entries||[]).forEach(e=>{ ["title","text","notes"].forEach(k=>{ if(e[k]==null) return; const tf=bookTitleFix(e[k]); if(tf!==e[k]){ e[k]=tf; n++; } }); });
   (b.entries||[]).forEach(e=>{ const t=out.find(x=>bookSameEntry(x,e)); if(t){ bookMergeInto(t,e); n++; } else out.push(e); });
   b.entries=out;
   const dd=(str,re,sep)=>{ const seen=new Set(); return String(str||"").split(re).filter(p=>{ const k=normTxt(p); if(!k) return true; if(seen.has(k)) return false; seen.add(k); return true; }).join(sep); };
