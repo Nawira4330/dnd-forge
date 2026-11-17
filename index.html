@@ -468,7 +468,7 @@
 /* ---------- Online-Abgleich (nur in der Online-Version): localStorage <-> private Datenbank ---------- */
 (function(){
   "use strict";
-  const SYNC=/^dnd_(characters_v1|homebrew_v1|group_v1|bestiary_v1|people_v1|sessions_v1|books_v1|seeded_books|seeded_people|seeded_chars|seeded_fenn|seeded_itemsen|seeded_sheet1|seeded_sheet2|seeded_sheet3|seeded_sheet4|seeded_sheet5|seeded_sheet6|seeded_sheet7|seeded_sheet8|seeded_sheet9)$/;
+  const SYNC=/^dnd_(characters_v1|homebrew_v1|group_v1|bestiary_v1|people_v1|sessions_v1|books_v1|seeded_books|seeded_people|seeded_chars|seeded_fenn|seeded_itemsen|seeded_sheet1|seeded_sheet2|seeded_sheet3|seeded_sheet4|seeded_sheet5|seeded_sheet6|seeded_sheet7|seeded_sheet8|seeded_sheet9|seeded_sheet10)$/;
   const HASHK="dnd_sync_hash", META="dnd_sync_meta", DEVK="dnd_sync_dev", PEND="dnd_sync_pending", CHUNK=60000;
   const ls=window.localStorage;
   const rawSet=Storage.prototype.setItem, rawRemove=Storage.prototype.removeItem;
@@ -8347,6 +8347,8 @@ function saveBooks(){ try{ localStorage.setItem(BOOKS_KEY,JSON.stringify(BOOKS))
     BOOKS.books.unshift({id:uid(),title:"Qualfas Tagebuch",desc:"Alles zu Qualfas Tagebuch: Seiten, Zitate, Rätsel, Hinweise und Querverweise.",entries:[],ts:Date.now(),upd:Date.now()}); saveBooks(); }
 })();
 const BOOKS_UI={sel:"",q:"",tag:"",sort:"order",diary:false};
+(function dedupeBooksOnce(){ try{ if(localStorage.getItem("dnd_seeded_sheet10")) return; localStorage.setItem("dnd_seeded_sheet10","1"); }catch(e){ return; }
+  let n=0; BOOKS.books.forEach(b=>{ n+=bookDedupe(b); }); if(n) saveBooks(); })();
 const isQualfa=b=>normTxt(b.title)==="qualfas tagebuch";
 const booksList=()=>BOOKS.books.filter(b=>isQualfa(b)===!!BOOKS_UI.diary);
 const bookNew=title=>({id:uid(),title:title||"",desc:"",entries:[],ts:Date.now(),upd:Date.now()});
@@ -8396,12 +8398,35 @@ function bookPasteModal(b){
     h("span",{class:"space"}),h("button",{class:"btn btn-ghost",onclick:closeModal},t("cancel"))));
   modal(body,{width:760});
 }
+/* two entries of a book that are really the same page (same page + similar title, or one text contains the other) */
+function bookSameEntry(a,c){
+  const ta=normTxt(a.title), tc=normTxt(c.title), pa=normTxt(a.page), pc=normTxt(c.page), xa=normTxt(a.text), xc=normTxt(c.text);
+  if(ta&&ta===tc&&pa===pc) return true;
+  if(xa.length>=30&&xc.length>=30&&(xa.includes(xc)||xc.includes(xa))) return true;
+  if(xa.length>=40&&xc.length>=40&&xa.slice(0,50)===xc.slice(0,50)) return true;
+  if(pa&&pa===pc&&ta&&tc&&(ta.includes(tc)||tc.includes(ta))) return true;
+  return false;
+}
+function bookMergeInto(t,e){
+  const add=(k,sep)=>{ const xt=normTxt(t[k]), xe=normTxt(e[k]); if(!xe||xt.includes(xe)) return; t[k]=(xt&&xe.includes(xt))?e[k]:((t[k]?t[k]+sep:"")+e[k]); };
+  add("text","\n\n"); add("notes","\n");
+  t.tags=[...new Set([...(t.tags||[]),...(e.tags||[])])]; ["title","page","date"].forEach(k=>{ if(!t[k]&&e[k]) t[k]=e[k]; }); t.upd=Date.now();
+}
+/* merges double entries of one book and removes paragraphs that are repeated inside a text; returns how many were fixed */
+function bookDedupe(b){
+  const out=[]; let n=0;
+  (b.entries||[]).forEach(e=>{ const t=out.find(x=>bookSameEntry(x,e)); if(t){ bookMergeInto(t,e); n++; } else out.push(e); });
+  b.entries=out;
+  const dd=(str,re,sep)=>{ const seen=new Set(); return String(str||"").split(re).filter(p=>{ const k=normTxt(p); if(!k) return true; if(seen.has(k)) return false; seen.add(k); return true; }).join(sep); };
+  out.forEach(e=>{ const t2=dd(e.text,/\n{2,}/,"\n\n"), n2=dd(e.notes,/\n+/,"\n"); if(t2!==(e.text||"")){ e.text=t2; n++; } if(n2!==(e.notes||"")){ e.notes=n2; n++; } });
+  return n;
+}
 function booksMerge(data){
   let nb=0,ne=0,ue=0;
   (data.books||[]).forEach(src=>{ if(!src||!src.title) return;
     let b=BOOKS.books.find(x=>x.id===src.id||normTxt(x.title)===normTxt(src.title)); if(!b){ b=Object.assign(bookNew(src.title),{desc:src.desc||""}); BOOKS.books.push(b); nb++; } else if(src.desc&&!b.desc) b.desc=src.desc;
     (src.entries||[]).forEach(e=>{ if(!e||(!e.title&&!e.text)) return;
-      const t0=b.entries.find(x=>normTxt(x.title)===normTxt(e.title)&&normTxt(x.page)===normTxt(e.page));
+      const t0=b.entries.find(x=>normTxt(x.title)===normTxt(e.title)&&normTxt(x.page)===normTxt(e.page))||b.entries.find(x=>bookSameEntry(x,e));
       if(t0){ let ch=false; if(e.text&&!normTxt(t0.text).includes(normTxt(e.text))){ t0.text=(t0.text?t0.text+"\n\n":"")+e.text; ch=true; }
         if(e.notes&&!normTxt(t0.notes).includes(normTxt(e.notes))){ t0.notes=(t0.notes?t0.notes+"\n":"")+e.notes; ch=true; }
         const tg=[...new Set([...(t0.tags||[]),...slogArr(e.tags)])]; if(tg.length!==(t0.tags||[]).length){ t0.tags=tg; ch=true; } if(ch){ t0.upd=Date.now(); ue++; } }
@@ -8431,6 +8456,8 @@ function booksView(){
   if(!b){ wrap.appendChild(h("div",{class:"card",style:"margin-top:10px"},h("p",{class:"muted"},T2("Noch kein Buch – mit „＋ Neues Buch“ anlegen.","No book yet – create one with “＋ New book”.")))); return wrap; }
   const card=h("div",{class:"card",style:"margin-top:10px"});
   card.appendChild(h("div",{class:"row",style:"gap:8px;flex-wrap:wrap;align-items:center"},h("h3",{style:"margin:0"},b.title),h("span",{class:"space"}),
+    h("button",{class:"btn btn-sm",title:T2("Doppelte Einträge (gleiche Seite/Überschrift oder gleicher Text) zusammenführen","Merge double entries (same page/heading or same text)"),onclick:()=>{ const n=bookDedupe(JSON.parse(JSON.stringify(b))); if(!n){ toast("✓ "+T2("Keine doppelten Einträge gefunden","No double entries found")); return; }
+      askYes(n+" "+T2("doppelte Stellen gefunden. Zusammenführen? (Texte, Notizen und Tags werden vereint, nichts geht verloren.)","double spots found. Merge them? (texts, notes and tags are combined, nothing is lost.)"),()=>{ const m=bookDedupe(b); saveBooks(); render(); toast("🧹 "+m+" "+T2("zusammengeführt","merged")); },{danger:false,yes:T2("Zusammenführen","Merge")}); }},"🧹 "+T2("Doppelte","Duplicates")),
     h("button",{class:"btn btn-sm",onclick:()=>bookEditModal(b)},"✎ "+T2("Buch","Book")),
     h("button",{class:"btn btn-sm btn-danger",onclick:()=>askYes(T2("Das Buch „"+b.title+"“ mit allen "+(b.entries||[]).length+" Einträgen löschen?","Delete the book “"+b.title+"” with all "+(b.entries||[]).length+" entries?"),()=>{ BOOKS.books=BOOKS.books.filter(x=>x.id!==b.id); BOOKS_UI.sel=""; saveBooks(); render(); })},"🗑")));
   if(b.desc) card.appendChild(h("div",{class:"small muted",style:"margin-top:4px;white-space:pre-wrap"},b.desc));
