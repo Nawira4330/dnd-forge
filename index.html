@@ -319,13 +319,13 @@
       </div>
       <div class="shelf tools" aria-label="Werkzeuge">
         <button class="book bk-home" id="btnHomebrew" title="Homebrew"><span class="bi">🧪</span><span class="bt">Homebrew</span></button>
-        <button class="book bk-imp" id="btnImport" title="Import"><span class="bi">⬆</span><span class="bt">Import</span></button>
+        <button class="book bk-imp" id="btnImport" title="Import – mehrere Dateien auf einmal (Charaktere, Bestiarium, Spiellog, Qualfas Tagebuch …)"><span class="bi">⬆</span><span class="bt">Import</span></button>
         <button class="book bk-exp" id="btnExportAll" title="Alle exportieren"><span class="bi">⬇</span><span class="bt">Export</span></button>
         <button class="book bk-bak" id="btnBackup" title="Datensicherung"><span class="bi">🛟</span><span class="bt">Backup</span><span class="bs"></span></button>
         <button class="book bk-help" id="btnHelp" title="Hilfe"><span class="bt">?</span></button>
       </div>
     </div>
-    <input type="file" id="fileImport" accept="application/json" class="hidden">
+    <input type="file" id="fileImport" accept=".json,application/json,.txt,.md,.csv,text/plain" multiple class="hidden">
     <input type="file" id="fileBeast" accept=".json,.txt,.md,.csv,text/plain,application/json" class="hidden">
   </aside>
   <main class="main" id="main"></main>
@@ -5208,6 +5208,35 @@ function invUi(scope){ return INV_UI[scope]||(INV_UI[scope]={sort:"name",dir:1,q
 /* owner of a party item: only names of characters (own characters, the other players' characters, NPC) plus the separate storage "Bag of Holding" */
 function charOwnerNames(){ return [...new Set([...CHARS.map(x=>x.name),...(GROUP.playerNames||[]),"NPC","Bag of Holding"].map(n=>String(n||"").trim()).filter(Boolean))]; }
 function ownerNames(){ return [...new Set([T2("Gruppenlager","Party stash"),...CHARS.map(x=>x.name).filter(Boolean),...GROUP.playerNames.filter(Boolean),...GROUP.items.map(i=>i.owner).filter(Boolean)])]; }
+/* change the owner of several selected items at once.
+   party inventory: the owner field is set; own inventory: the items move to another character's inventory or into the party inventory under a name */
+function ownerChangeModal(chosen,own,done){
+  const body=h("div",{}), stash=T2("Gruppenlager (niemand)","Party stash (nobody)"), cur=curChar();
+  body.appendChild(h("h2",{style:"margin-top:0"},"👤 "+T2("Besitzer wechseln","Change owner")+" ("+chosen.length+")"));
+  body.appendChild(h("p",{class:"small muted"},chosen.slice(0,12).map(i=>i.name).join(", ")+(chosen.length>12?" …":"")));
+  const opts=[];
+  if(own){ CHARS.filter(x=>!cur||x.id!==cur.id).forEach(x=>opts.push({k:"c:"+x.id,l:"🧙 "+x.name+" ("+T2("Inventar","inventory")+")"}));
+    opts.push({k:"g:",l:"🎒 "+stash});
+    charOwnerNames().filter(n=>!CHARS.some(x=>x.name===n)).forEach(n=>opts.push({k:"g:"+n,l:"🎒 "+n+" ("+T2("im Gruppeninventar","in the party inventory")+")"})); }
+  else{ opts.push({k:"g:",l:stash}); charOwnerNames().forEach(n=>opts.push({k:"g:"+n,l:n})); }
+  let sel=opts[0]?opts[0].k:"";
+  const dd=h("select",{onchange:e=>{ sel=e.target.value; }},...opts.map(o=>h("option",{value:o.k},o.l)));
+  body.appendChild(dd);
+  body.appendChild(h("p",{class:"small muted"},own?T2("Die Gegenstände wandern aus diesem Inventar zum Ziel (ausgerüstet/eingestimmt wird zurückgesetzt).","The items move from this inventory to the target (equipped / attuned is reset)."):T2("Eingestimmt wird beim Wechsel zurückgesetzt.","Attuned is reset on change.")));
+  body.appendChild(h("div",{class:"row",style:"gap:8px;margin-top:10px"},
+    h("button",{class:"btn btn-primary",onclick:()=>{
+      if(!sel&&sel!=="") return;
+      if(own){
+        const from=cur?cur.inventory:null; if(!from) return;
+        chosen.forEach(it=>{ if(sel.startsWith("c:")){ const ch=CHARS.find(x=>x.id===sel.slice(2)); if(ch) moveItemTo(it,it.qty,ch.inventory,"",ch); }
+          else moveItemTo(it,it.qty,GROUP.items,sel.slice(2),null);
+          const i=from.indexOf(it); if(i>=0) from.splice(i,1); });
+        saveAll();
+      }else{ const o=sel.slice(2); chosen.forEach(it=>{ it.owner=o; it.attuned=false; }); saveGroup(); }
+      closeModal(); if(done) done(); render(); toast("👤 "+chosen.length+" "+T2("Gegenstände übertragen","items transferred")); }},"👤 "+T2("Übernehmen","Apply")),
+    h("span",{class:"space"}),h("button",{class:"btn btn-ghost",onclick:closeModal},t("cancel"))));
+  modal(body,{width:520});
+}
 /* ---------------- item list (own + party inventory): grouped by type, one compact line per item, editing in a fold-out ---------------- */
 const INV_ORDER=["weapon","armor","magic","potion","consumable","tool","book","scroll","valuable","alchemy","other"];
 const INV_EQUIPPABLE=["weapon","armor","magic","tool","other"];     // can be "equipped" (shown on the overview)
@@ -5339,6 +5368,7 @@ function itemTable(ctx){
     selBar.appendChild(h("span",{class:"small muted"},T2("Auswahl: ","Selected: ")+chosen.length));
     selBar.appendChild(h("button",{class:"btn btn-sm btn-primary",onclick:()=>sellModal(ctx.scope,chosen,()=>{ ui.sel.clear(); })},"💰 "+T2("Sammelverkauf","Bulk sale")));
     selBar.appendChild(h("button",{class:"btn btn-sm",onclick:()=>transferModal(chosen,own?"toGroup":"toOwn")},own?"📤 "+T2("→ Gruppeninventar","→ party inventory"):"📥 "+T2("Behalten / zuteilen","Keep / assign")));
+    selBar.appendChild(h("button",{class:"btn btn-sm",title:own?T2("Auswahl in das Inventar eines anderen Charakters oder in das Gruppeninventar verschieben","Move the selection to another character or into the party inventory"):T2("Besitzer der ganzen Auswahl auf einmal ändern","Change the owner of the whole selection at once"),onclick:()=>ownerChangeModal(chosen,own,()=>{ ui.sel.clear(); })},"👤 "+T2("Besitzer wechseln","Change owner")));
     selBar.appendChild(h("button",{class:"btn btn-sm btn-danger",onclick:()=>{ askYes(T2(chosen.length+" Gegenstände löschen (ohne Verkauf)?",chosen.length+" items delete (no sale)?"),()=>{
       const l=items(); chosen.forEach(i=>l.splice(l.indexOf(i),1)); ui.sel.clear(); ctx.save(); paint(); }); }},"🗑 "+T2("Löschen","Delete")));
     selBar.appendChild(h("button",{class:"btn btn-sm btn-ghost",onclick:()=>{ ui.sel.clear(); paint(); }},T2("Auswahl aufheben","Clear selection")));
@@ -7537,25 +7567,47 @@ $("#fileBeast").addEventListener("change",ev=>{ const f=ev.target.files[0]; if(!
   r.onload=()=>{ importBestiaryText(String(r.result),f.name).catch(err=>alert("Import-Fehler: "+err)); }; r.readAsText(f); ev.target.value=""; });
 $("#btnExportAll").addEventListener("click",()=> download("dnd_charaktere_alle.json", JSON.stringify({characters:CHARS,homebrew:HOMEBREW,group:GROUP,bestiary:BEST.entries,people:PEOPLE.entries,spiellog:{sessions:SLOG.sessions,quests:SLOG.quests,players:SLOG.players},books:BOOKS.books},null,2)));
 $("#btnImport").addEventListener("click",()=> $("#fileImport").click());
-$("#fileImport").addEventListener("change",ev=>{
-  const file=ev.target.files[0]; if(!file) return;
-  const r=new FileReader();
-  r.onload=()=>{ try{
-    const data=JSON.parse(r.result);
-    if(Array.isArray(data)){ data.forEach(x=>{ x.id=uid(); ensureShape(x); CHARS.push(x); }); }
-    else if(data.characters){ data.characters.forEach(x=>{ x.id=uid(); ensureShape(x); CHARS.push(x); });
-      if(data.homebrew){ for(const k in HOMEBREW) if(data.homebrew[k]) HOMEBREW[k]=HOMEBREW[k].concat(data.homebrew[k]); saveHomebrew(); }
-      if(data.group){ const ids=new Set(GROUP.items.map(i=>i.id)); (data.group.items||[]).forEach(i=>{ if(!ids.has(i.id)) GROUP.items.push(normItem(i)); });
-        const lid=new Set(GROUP.ledger.map(e=>e.id)); (data.group.ledger||[]).forEach(e=>{ if(!lid.has(e.id)) GROUP.ledger.push(e); }); saveGroup(); }
-      if(data.bestiary){ const bn=new Set(BEST.entries.map(e=>e.id)); data.bestiary.forEach(e=>{ if(!bn.has(e.id)) BEST.entries.push(e); }); saveBest(); }
-      if(data.people){ const pn=new Set(PEOPLE.entries.map(e=>e.id)); data.people.forEach(e=>{ if(e&&!pn.has(e.id)) PEOPLE.entries.push(e); }); savePeople(); }
-      if(data.spiellog) slogMerge(data.spiellog);
-      if(data.books) booksMerge({books:data.books}); }
-    else { data.id=uid(); ensureShape(data); CHARS.push(data); }
-    CURRENT=CHARS[CHARS.length-1].id; saveChars(); render(); toast(t("saved"));
-  }catch(err){ alert("Import-Fehler: "+err); } };
-  r.readAsText(file); ev.target.value="";
-});
+/* ---- Import: several files at once; every file is recognised by its content and sent to the right place ---- */
+const impIsChar=x=>!!(x&&typeof x==="object"&&!Array.isArray(x)&&x.name&&(x.classes||x.speciesId||x.ruleset));
+function impAddChars(list){
+  const key=x=>normTxt(x.name)+"|"+JSON.stringify(x.classes||null), have=new Set(CHARS.map(key)); let n=0,dup=0;
+  list.forEach(x=>{ if(!impIsChar(x)) return; if(have.has(key(x))){ dup++; return; } x.id=uid(); ensureShape(x); CHARS.push(x); have.add(key(x)); n++; });
+  if(n) CURRENT=CHARS[CHARS.length-1].id; return {n:n,dup:dup};
+}
+async function importFiles(files){
+  const log=[]; let pend=null;
+  for(const f of files){
+    const L=(ok,msg)=>log.push({ok:ok,name:f.name,msg:msg});
+    let txt=""; try{ txt=await f.text(); }catch(e){ L(false,T2("Datei nicht lesbar","file not readable")); continue; }
+    let o=null; try{ o=JSON.parse(txt); }catch(e){}
+    try{
+      if(o==null&&/\.json$/i.test(f.name)){ L(false,T2("keine gültige JSON-Datei","not a valid JSON file")); continue; }
+      if(o==null||typeof o!=="object"){ const n0=BEST.entries.length; await importBestiaryText(txt,f.name); L(true,T2("Bestiarium (Namensliste): ","Bestiary (name list): ")+(BEST.entries.length-n0)+" "+T2("neu","new")); continue; }
+      if(!Array.isArray(o)&&o.app==="dnd-character-forge"&&o.keys){ L(false,T2("Das ist eine Backup-Datei – bitte über „🛟 Backup“ einspielen","This is a backup file – please restore it via “🛟 Backup”")); continue; }
+      if(!Array.isArray(o)&&o.characters){   // "export all" file
+        const c=impAddChars(o.characters); let more=[];
+        if(o.homebrew){ for(const k in HOMEBREW) if(o.homebrew[k]) HOMEBREW[k]=HOMEBREW[k].concat(o.homebrew[k]); saveHomebrew(); more.push("Homebrew"); }
+        if(o.group){ const ids=new Set(GROUP.items.map(i=>i.id)); (o.group.items||[]).forEach(i=>{ if(!ids.has(i.id)) GROUP.items.push(normItem(i)); }); const lid=new Set(GROUP.ledger.map(e=>e.id)); (o.group.ledger||[]).forEach(e=>{ if(!lid.has(e.id)) GROUP.ledger.push(e); }); saveGroup(); more.push(T2("Gruppeninventar","party inventory")); }
+        if(o.bestiary){ const bn=new Set(BEST.entries.map(e=>e.id)); o.bestiary.forEach(e=>{ if(!bn.has(e.id)) BEST.entries.push(e); }); saveBest(); more.push(T2("Bestiarium","bestiary")); }
+        if(o.people){ const pn=new Set(PEOPLE.entries.map(e=>e.id)); o.people.forEach(e=>{ if(e&&!pn.has(e.id)) PEOPLE.entries.push(e); }); savePeople(); more.push(T2("Personen","people")); }
+        if(o.spiellog){ slogMerge(o.spiellog); more.push("Spiellog"); }
+        if(o.books){ booksMerge({books:o.books}); more.push(T2("Bücher","books")); }
+        L(true,c.n+" "+T2("Charaktere","characters")+(c.dup?" ("+c.dup+" "+T2("schon vorhanden","already there")+")":"")+(more.length?" + "+more.join(", "):"")); continue; }
+      if(!Array.isArray(o)&&(o.sessions||o.quests||o.spiellog)){ pend=o.spiellog||o; L(true,T2("Spiellog – der Abgleich folgt gleich","Session log – the comparison follows")); continue; }
+      if(!Array.isArray(o)&&(Array.isArray(o.books)||(o.title&&Array.isArray(o.entries)))){ const x=booksMerge(o.books?o:{books:[o]}); L(true,x.nb+" "+T2("neue Bücher","new books")+" · "+x.ne+" "+T2("neue Einträge","new entries")+" · "+x.ue+" "+T2("ergänzt","updated")); continue; }
+      if(Array.isArray(o)&&o.some(impIsChar)||impIsChar(o)){ const c=impAddChars(Array.isArray(o)?o:[o]); L(true,c.n+" "+T2("Charakter(e)","character(s)")+(c.dup?" ("+c.dup+" "+T2("schon vorhanden","already there")+")":"")); continue; }
+      if(Array.isArray(o)||o.bestiary||o.monsters||o.results||o.entries||(o.name&&(o.m||o.hit_points!=null||o.armor_class!=null))){ const n0=BEST.entries.length; await importBestiaryText(txt,f.name); L(true,T2("Bestiarium: ","Bestiary: ")+(BEST.entries.length-n0)+" "+T2("neue Wesen","new creatures")); continue; }
+      L(false,T2("Format nicht erkannt","format not recognised"));
+    }catch(err){ L(false,String(err&&err.message||err)); }
+  }
+  saveChars(); render();
+  const body=h("div",{});
+  body.appendChild(h("h2",{style:"margin-top:0"},"⬆ "+T2("Import – Ergebnis","Import – result")));
+  log.forEach(x=>body.appendChild(h("div",{class:"small",style:"margin-bottom:4px"},(x.ok?"✓ ":"⚠ "),h("b",{},x.name),": "+x.msg)));
+  body.appendChild(h("div",{class:"row",style:"gap:8px;margin-top:12px"},h("button",{class:"btn btn-primary",onclick:()=>{ closeModal(); if(pend) slogImportModal(pend); }},pend?T2("Weiter zum Spiellog-Abgleich","Continue to the session log comparison"):"OK")));
+  modal(body,{width:620});
+}
+$("#fileImport").addEventListener("change",ev=>{ const files=[...ev.target.files]; ev.target.value=""; if(files.length) importFiles(files).catch(err=>alert("Import-Fehler: "+err)); });
 const termsCb=$("#termsEn"); termsCb.checked=TERMS_EN;
 termsCb.addEventListener("change",e=>{ TERMS_EN=e.target.checked; localStorage.setItem(TERMS_KEY,TERMS_EN?"1":"0"); applyTerms(); render(); });
 $("#langSel").addEventListener("change",e=>{ LANG=e.target.value; localStorage.setItem("dnd_lang",LANG); render(); });
