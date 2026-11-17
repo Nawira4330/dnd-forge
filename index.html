@@ -338,7 +338,7 @@
   "use strict";
   const cfg=window.DND_SB;
   if(!cfg||!cfg.url||!cfg.key||window.claude) return;
-  const base=String(cfg.url).replace(/\/+$/,""), key=cfg.key, SKEY="dnd_sync_session", TABLE="dnd_sync", POLL=30000, IDLE_POLL=120000, IDLE_AFTER=300000;   // check every 30 s while in use, every 2 min when idle, not at all while the tab is hidden (keeps the data transfer small)
+  const base=String(cfg.url).replace(/\/+$/,""), key=cfg.key, SKEY="dnd_sync_session", TABLE="dnd_sync", POLL=3600000, IDLE_POLL=3600000, IDLE_AFTER=300000;   // check once an hour (plus right when the tab becomes visible again or the device comes back online) (keeps the data transfer small)
   let lastAct=Date.now(); ["pointerdown","keydown","touchstart","scroll"].forEach(ev=>window.addEventListener(ev,()=>{ lastAct=Date.now(); },{passive:true,capture:true}));
   const hs=s=>{ let h=2166136261; for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619); } return (h>>>0).toString(36)+":"+s.length; };
   const CHUNK=60000;
