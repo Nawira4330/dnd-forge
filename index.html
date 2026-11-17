@@ -338,7 +338,10 @@
   "use strict";
   const cfg=window.DND_SB;
   if(!cfg||!cfg.url||!cfg.key||window.claude) return;
-  const base=String(cfg.url).replace(/\/+$/,""), key=cfg.key, SKEY="dnd_sync_session", TABLE="dnd_sync", POLL=20000;
+  const base=String(cfg.url).replace(/\/+$/,""), key=cfg.key, SKEY="dnd_sync_session", TABLE="dnd_sync", POLL=30000, IDLE_POLL=120000, IDLE_AFTER=300000;   // check every 30 s while in use, every 2 min when idle, not at all while the tab is hidden (keeps the data transfer small)
+  let lastAct=Date.now(); ["pointerdown","keydown","touchstart","scroll"].forEach(ev=>window.addEventListener(ev,()=>{ lastAct=Date.now(); },{passive:true,capture:true}));
+  const hs=s=>{ let h=2166136261; for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619); } return (h>>>0).toString(36)+":"+s.length; };
+  const CHUNK=60000;
   const DOMAIN=cfg.emailDomain||"dnd-forge.example.com", NEED=cfg.requireLogin!==false, SIGNUP=cfg.allowSignup!==false;
   /* user name (= character name) -> the e-mail address Supabase uses internally; a real address is used as typed */
   const slug=n=>String(n).trim().toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/ß/g,"ss").replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"");
@@ -402,7 +405,7 @@
     });
     return loginP;
   }
-  window.__sbLogout=function(){ saveSess(null); try{ localStorage.removeItem("dnd_sync_meta"); localStorage.removeItem("dnd_sync_pending"); }catch(e){} location.reload(); };
+  window.__sbLogout=function(){ saveSess(null); try{ localStorage.removeItem("dnd_sync_meta"); localStorage.removeItem("dnd_sync_hash"); localStorage.removeItem("dnd_sync_pending"); }catch(e){} location.reload(); };
   window.__sbEmail=()=>sess&&(sess.name||sess.email)||"";
   if(NEED&&!sess){ const kick=()=>{ if(!sess) ensureLogin(); }; if(document.body) kick(); else document.addEventListener("DOMContentLoaded",kick,{once:true}); }   // locked until signed in
   /* ---- document store on top of one table (user_id, id, ts, dev, n, p) ---- */
@@ -420,10 +423,19 @@
         let first=true, stopped=false, busy=false, timer=null;
         const emit=(docs,changes)=>next({docs:docs,size:docs.length,empty:!docs.length,docChanges:()=>changes,metadata:{fromCache:false,hasPendingWrites:false}});
         async function poll(){
-          if(busy||stopped) return; busy=true;
+          if(busy||stopped) return; if(!first&&document.hidden){ clearTimeout(timer); timer=setTimeout(poll,POLL); return; } busy=true;
           try{
             if(first){
-              const rows=await api("GET",TABLE+"?select=id,ts,dev,n,p&user_id=eq."+uid)||[];
+              /* only the small head list is downloaded first; what this device already has (same timestamp, unchanged fingerprint) is taken from local storage */
+              const heads=await api("GET",TABLE+"?select=id,ts,dev,n&user_id=eq."+uid)||[];
+              let meta={}, hash={}; try{ meta=JSON.parse(localStorage.getItem("dnd_sync_meta")||"{}"); hash=JSON.parse(localStorage.getItem("dnd_sync_hash")||"{}"); }catch(e){}
+              const rows=[], local=new Set(), need=[];
+              heads.forEach(h=>{ if(h.id.indexOf("~")>0) return; let v=null; try{ v=localStorage.getItem(h.id); }catch(e){}
+                if(v!=null&&meta[h.id]>=Number(h.ts)&&hash[h.id]===hs(v)&&Math.max(1,Math.ceil(v.length/CHUNK))===(h.n||1)){
+                  local.add(h.id); const n=Math.max(1,Math.ceil(v.length/CHUNK));
+                  for(let i=0;i<n;i++) rows.push({id:i?h.id+"~"+i:h.id,ts:h.ts,dev:h.dev,n:i?null:n,p:v.slice(i*CHUNK,(i+1)*CHUNK)}); } });
+              heads.forEach(h=>{ const b=h.id.indexOf("~")>0?h.id.slice(0,h.id.indexOf("~")):h.id; if(!local.has(b)) need.push(h.id); });
+              for(let i=0;i<need.length;i+=40){ const part=need.slice(i,i+40); const got=await api("GET",TABLE+"?select=id,ts,dev,n,p&user_id=eq."+uid+"&id=in.("+q(part.map(x=>'"'+x+'"').join(","))+")")||[]; got.forEach(r=>rows.push(r)); }
               const docs=rows.map(toDoc); rows.forEach(r=>known.set(r.id,sig(r))); first=false;
               emit(docs,docs.map(d=>({type:"added",doc:d})));
             }else{
@@ -435,7 +447,7 @@
               if(changes.length) emit([],changes);
             }
           }catch(e){ if(e&&e.code==="revoked"){ stopped=true; if(err) err(e); if(NEED) ensureLogin().then(ok=>{ if(ok) location.reload(); }); } }
-          busy=false; if(!stopped){ clearTimeout(timer); timer=setTimeout(poll,POLL); }
+          busy=false; if(!stopped){ clearTimeout(timer); timer=setTimeout(poll,Date.now()-lastAct>IDLE_AFTER?IDLE_POLL:POLL); }
         }
         document.addEventListener("visibilitychange",()=>{ if(!document.hidden&&!first) poll(); });
         window.addEventListener("online",()=>{ if(!first) poll(); });
@@ -457,9 +469,11 @@
 (function(){
   "use strict";
   const SYNC=/^dnd_(characters_v1|homebrew_v1|group_v1|bestiary_v1|people_v1|sessions_v1|books_v1|seeded_books|seeded_people|seeded_chars|seeded_fenn|seeded_itemsen|seeded_sheet1|seeded_sheet2|seeded_sheet3|seeded_sheet4|seeded_sheet5|seeded_sheet6|seeded_sheet7|seeded_sheet8|seeded_sheet9)$/;
-  const META="dnd_sync_meta", DEVK="dnd_sync_dev", PEND="dnd_sync_pending", CHUNK=60000;
+  const HASHK="dnd_sync_hash", META="dnd_sync_meta", DEVK="dnd_sync_dev", PEND="dnd_sync_pending", CHUNK=60000;
   const ls=window.localStorage;
   const rawSet=Storage.prototype.setItem, rawRemove=Storage.prototype.removeItem;
+  /* fingerprint of the value that was last synced: lets the online version skip downloading data this device already has */
+  const hs=s=>{ let h=2166136261; for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619); } return (h>>>0).toString(36)+":"+s.length; };
   const safe=f=>{ try{ return f(); }catch(e){ return null; } };
   const readJ=k=>safe(()=>JSON.parse(ls.getItem(k)||"{}"))||{};
   const writeJ=(k,v)=>safe(()=>rawSet.call(ls,k,JSON.stringify(v)));
@@ -506,7 +520,7 @@
     const parts=[]; for(let i=0;i<val.length;i+=CHUNK) parts.push(val.slice(i,i+CHUNK)); if(!parts.length) parts.push("");
     for(let i=1;i<parts.length;i++) await col.doc(k+"~"+i).set({ts,dev,p:parts[i]});
     await col.doc(k).set({ts,dev,n:parts.length,p:parts[0]});
-    const m=readJ(META); m[k]=ts; writeJ(META,m);
+    const m=readJ(META); m[k]=ts; writeJ(META,m); const g=readJ(HASHK); g[k]=hs(val); writeJ(HASHK,g);
   }
   async function flush(){
     if(timer){ clearTimeout(timer); timer=null; }
@@ -539,16 +553,16 @@
   }
   /* take newer remote values into localStorage; returns how many were replaced */
   function pull(){
-    const m=readJ(META); let changed=0;
+    const m=readJ(META), g=readJ(HASHK); let changed=0;
     Object.keys(remote).forEach(k=>{
       const r=remote[k]; if(!r.head||r.head.dev===dev) return;
       const rts=r.head.ts||0; if(rts<=(m[k]||0)) return;
       if(pend[k]&&pend[k]>=rts) return;                 // my unsent change is newer
       const val=assemble(k); if(val==null) return;       // chunks still arriving
       if(ls.getItem(k)!==val){ rawSet.call(ls,k,val); changed++; }
-      m[k]=rts; delete pend[k];
+      m[k]=rts; g[k]=hs(val); delete pend[k];
     });
-    writeJ(META,m); writeJ(PEND,pend);
+    writeJ(HASHK,g); writeJ(META,m); writeJ(PEND,pend);
     return changed;
   }
   async function start(){
