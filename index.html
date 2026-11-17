@@ -468,7 +468,7 @@
 /* ---------- Online-Abgleich (nur in der Online-Version): localStorage <-> private Datenbank ---------- */
 (function(){
   "use strict";
-  const SYNC=/^dnd_(characters_v1|homebrew_v1|group_v1|bestiary_v1|people_v1|sessions_v1|books_v1|seeded_books|seeded_people|seeded_chars|seeded_fenn|seeded_itemsen|seeded_sheet1|seeded_sheet2|seeded_sheet3|seeded_sheet4|seeded_sheet5|seeded_sheet6|seeded_sheet7|seeded_sheet8|seeded_sheet9|seeded_sheet10)$/;
+  const SYNC=/^dnd_(characters_v1|homebrew_v1|group_v1|bestiary_v1|people_v1|sessions_v1|books_v1|seeded_books|seeded_people|seeded_chars|seeded_fenn|seeded_itemsen|seeded_sheet1|seeded_sheet2|seeded_sheet3|seeded_sheet4|seeded_sheet5|seeded_sheet6|seeded_sheet7|seeded_sheet8|seeded_sheet9|seeded_sheet10|seeded_sheet11)$/;
   const HASHK="dnd_sync_hash", META="dnd_sync_meta", DEVK="dnd_sync_dev", PEND="dnd_sync_pending", CHUNK=60000;
   const ls=window.localStorage;
   const rawSet=Storage.prototype.setItem, rawRemove=Storage.prototype.removeItem;
@@ -8399,7 +8399,7 @@ function saveBooks(){ try{ localStorage.setItem(BOOKS_KEY,JSON.stringify(BOOKS))
     BOOKS.books.unshift({id:uid(),title:"Qualfas Tagebuch",desc:"Alles zu Qualfas Tagebuch: Seiten, Zitate, Rätsel, Hinweise und Querverweise.",entries:[],ts:Date.now(),upd:Date.now()}); saveBooks(); }
 })();
 const BOOKS_UI={sel:"",q:"",tag:"",sort:"order",diary:false};
-(function dedupeBooksOnce(){ try{ if(localStorage.getItem("dnd_seeded_sheet10")) return; localStorage.setItem("dnd_seeded_sheet10","1"); }catch(e){ return; }
+(function dedupeBooksOnce(){ try{ if(localStorage.getItem("dnd_seeded_sheet11")) return; localStorage.setItem("dnd_seeded_sheet11","1"); }catch(e){ return; }
   let n=0; BOOKS.books.forEach(b=>{ n+=bookDedupe(b); }); if(n) saveBooks(); })();
 const isQualfa=b=>normTxt(b.title)==="qualfas tagebuch";
 const booksList=()=>BOOKS.books.filter(b=>isQualfa(b)===!!BOOKS_UI.diary);
@@ -8457,16 +8457,26 @@ function bookSameEntry(a,c){
   if(xa.length>=30&&xc.length>=30&&(xa.includes(xc)||xc.includes(xa))) return true;
   if(xa.length>=40&&xc.length>=40&&xa.slice(0,50)===xc.slice(0,50)) return true;
   if(pa&&pa===pc&&ta&&tc&&(ta.includes(tc)||tc.includes(ta))) return true;
+  const bt=x=>normTxt(String(x||"").replace(/\(.*?\)/g,"")); if(pa&&pa===pc&&bt(a.title)&&bt(a.title)===bt(c.title)) return true;
+  if(pa&&pa===pc&&bookWordsAlike(a.text,c.text)) return true;
   return false;
 }
+/* mostly the same words (e.g. the same text once with German and once with English terms) */
+function bookWordsAlike(a,b){
+  const w=x=>new Set(normTxt(x).split(" ").filter(z=>z.length>2)); const A=w(a), B=w(b); if(A.size<6||B.size<6) return false;
+  let c=0; A.forEach(z=>{ if(B.has(z)) c++; }); return c/(A.size+B.size-c)>=0.6;
+}
+/* language names stay English (Common, Dwarvish …) */
+function bookTitleFix(t){ return String(t||"").replace(/Gemeinsprache/g,"Common").replace(/[Zz]wergische Runen/g,"Dwarvish runes").replace(/[Zz]wergisch(?![a-z])/g,"Dwarvish").replace(/[Ee]lfisch(?![a-z])/g,"Elvish"); }
 function bookMergeInto(t,e){
-  const add=(k,sep)=>{ const xt=normTxt(t[k]), xe=normTxt(e[k]); if(!xe||xt.includes(xe)) return; t[k]=(xt&&xe.includes(xt))?e[k]:((t[k]?t[k]+sep:"")+e[k]); };
+  const add=(k,sep)=>{ const xt=normTxt(t[k]), xe=normTxt(e[k]); if(!xe||xt.includes(xe)) return; if(xt&&xe.includes(xt)){ t[k]=e[k]; return; } if(xt&&bookWordsAlike(t[k],e[k])){ if(String(e[k]).length>=String(t[k]).length) t[k]=e[k]; return; } t[k]=(t[k]?t[k]+sep:"")+e[k]; };
   add("text","\n\n"); add("notes","\n");
   t.tags=[...new Set([...(t.tags||[]),...(e.tags||[])])]; ["title","page","date"].forEach(k=>{ if(!t[k]&&e[k]) t[k]=e[k]; }); t.upd=Date.now();
 }
 /* merges double entries of one book and removes paragraphs that are repeated inside a text; returns how many were fixed */
 function bookDedupe(b){
   const out=[]; let n=0;
+  (b.entries||[]).forEach(e=>{ const tf=bookTitleFix(e.title); if(tf!==(e.title||"")){ e.title=tf; n++; } });
   (b.entries||[]).forEach(e=>{ const t=out.find(x=>bookSameEntry(x,e)); if(t){ bookMergeInto(t,e); n++; } else out.push(e); });
   b.entries=out;
   const dd=(str,re,sep)=>{ const seen=new Set(); return String(str||"").split(re).filter(p=>{ const k=normTxt(p); if(!k) return true; if(seen.has(k)) return false; seen.add(k); return true; }).join(sep); };
