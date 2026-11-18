@@ -4316,6 +4316,55 @@ function tabFeatures(c){
   return wrap;
 }
 
+/* ---------------- Find Familiar (2014 rules, SRD 5.1): the 15 forms with their stat blocks ---------------- */
+const FAMILIAR_FORMS=[
+ {en:"Bat",de:"Fledermaus",ac:12,hp:1,speed:"5 ft, fly 30 ft",ab:[2,15,8,2,12,4],atk:["Bite","+0","1 piercing"],
+  nde:"Blindsicht 60 ft, Echolot (nicht wenn taub), scharfes Gehör und Geruch (Vorteil auf Wahrnehmung).",nen:"Blindsight 60 ft, echolocation (not while deafened), keen hearing and smell (advantage on Perception)."},
+ {en:"Cat",de:"Katze",ac:12,hp:2,speed:"40 ft, climb 30 ft",ab:[3,15,10,3,12,7],atk:["Claws","+0","1 slashing"],
+  nde:"Wahrnehmung +3, Heimlichkeit +4, scharfer Geruch.",nen:"Perception +3, Stealth +4, keen smell."},
+ {en:"Crab",de:"Krabbe",ac:11,hp:3,speed:"20 ft, swim 20 ft",ab:[2,11,10,1,8,2],atk:["Claw","+0","1 bludgeoning"],
+  nde:"Blindsicht 30 ft, amphibisch, Heimlichkeit +2.",nen:"Blindsight 30 ft, amphibious, Stealth +2."},
+ {en:"Frog",de:"Frosch",ac:11,hp:1,speed:"20 ft, swim 20 ft",ab:[1,13,8,1,8,3],atk:null,
+  nde:"Dunkelsicht 30 ft, amphibisch, Standsprung (weit 3 m, hoch 1,5 m). Kein Angriff.",nen:"Darkvision 30 ft, amphibious, standing leap (10 ft long, 5 ft high). No attack."},
+ {en:"Hawk",de:"Falke",ac:13,hp:1,speed:"10 ft, fly 60 ft",ab:[5,16,8,2,14,6],atk:["Talons","+5","1 slashing"],
+  nde:"Wahrnehmung +4, scharfe Augen (Vorteil auf Wahrnehmung per Sicht).",nen:"Perception +4, keen sight (advantage on sight Perception)."},
+ {en:"Lizard",de:"Eidechse",ac:10,hp:2,speed:"20 ft, climb 20 ft",ab:[2,11,10,1,8,3],atk:["Bite","+0","1 piercing"],
+  nde:"Dunkelsicht 30 ft.",nen:"Darkvision 30 ft."},
+ {en:"Octopus",de:"Krake",ac:12,hp:3,speed:"5 ft, swim 30 ft",ab:[4,15,11,3,10,4],atk:["Tentacles","+4","1 bludgeoning (grapple DC 10)"],
+  nde:"Dunkelsicht 30 ft, 30 Min. Atem anhalten, Wasseratmung, Tarnung unter Wasser (Vorteil auf Heimlichkeit), Heimlichkeit +4, Wahrnehmung +2. Fangarme: Ringkampf SG 10.",nen:"Darkvision 30 ft, holds breath 30 min, water breathing, underwater camouflage (advantage on Stealth), Stealth +4, Perception +2. Tentacles: grapple DC 10."},
+ {en:"Owl",de:"Eule",ac:11,hp:1,speed:"5 ft, fly 60 ft",ab:[3,13,8,2,12,7],atk:["Talons","+3","1 slashing"],
+  nde:"Dunkelsicht 120 ft, Wahrnehmung +3, Heimlichkeit +3, scharfes Gehör und Sicht, Vorbeiflug (keine Gelegenheitsangriffe).",nen:"Darkvision 120 ft, Perception +3, Stealth +3, keen hearing and sight, flyby (no opportunity attacks)."},
+ {en:"Poisonous Snake",de:"Giftschlange",ac:13,hp:2,speed:"30 ft, swim 30 ft",ab:[2,16,11,1,10,3],atk:["Bite","+5","1 piercing + 2d4 poison (Con DC 10, half on success)"],
+  nde:"Blindsicht 10 ft. Biss: 1 Stich plus 2W4 Gift (KO-Rettung SG 10, halb bei Erfolg).",nen:"Blindsight 10 ft. Bite: 1 piercing plus 2d4 poison (Con save DC 10, half on success)."},
+ {en:"Quipper",de:"Fisch (Quipper)",ac:13,hp:1,speed:"swim 40 ft",ab:[2,16,9,1,7,2],atk:["Bite","+5","1 piercing"],
+  nde:"Nur im Wasser. Dunkelsicht 60 ft, Wasseratmung, Blutrausch (Vorteil gegen verletzte Ziele).",nen:"Water only. Darkvision 60 ft, water breathing, blood frenzy (advantage against wounded targets)."},
+ {en:"Rat",de:"Ratte",ac:10,hp:1,speed:"20 ft",ab:[2,11,9,2,10,4],atk:["Bite","+0","1 piercing"],
+  nde:"Dunkelsicht 30 ft, scharfer Geruch.",nen:"Darkvision 30 ft, keen smell."},
+ {en:"Raven",de:"Rabe",ac:12,hp:1,speed:"10 ft, fly 50 ft",ab:[2,14,8,2,12,6],atk:["Beak","+4","1 piercing"],
+  nde:"Wahrnehmung +3, kann einfache Laute nachahmen (Einsicht SG 10 erkennt es).",nen:"Perception +3, mimics simple sounds (Insight DC 10 notices)."},
+ {en:"Sea Horse",de:"Seepferdchen",ac:11,hp:1,speed:"swim 20 ft",ab:[1,12,8,1,10,2],atk:null,
+  nde:"Nur im Wasser, Wasseratmung. Kein Angriff.",nen:"Water only, water breathing. No attack."},
+ {en:"Spider",de:"Spinne",ac:12,hp:1,speed:"20 ft, climb 20 ft",ab:[2,14,8,1,10,2],atk:["Bite","+4","1 piercing + 2d4 poison (Con DC 9, half on success)"],
+  nde:"Dunkelsicht 30 ft, Heimlichkeit +4, Spinnenklettern, Netzsinn, Netzläufer. Biss: 1 Stich plus 2W4 Gift (KO-Rettung SG 9).",nen:"Darkvision 30 ft, Stealth +4, spider climb, web sense, web walker. Bite: 1 piercing plus 2d4 poison (Con save DC 9)."},
+ {en:"Weasel",de:"Wiesel",ac:13,hp:1,speed:"30 ft",ab:[3,16,8,2,12,3],atk:["Bite","+5","1 piercing"],
+  nde:"Wahrnehmung +3, Heimlichkeit +5, scharfes Gehör und Geruch.",nen:"Perception +3, Stealth +5, keen hearing and smell."}
+];
+function familiarTable(c){
+  const wrap=h("div",{});
+  wrap.appendChild(h("p",{class:"small muted",style:"margin:0 0 6px"},T2("Regeln 2014 (SRD 5.1): winziger Geist in Tiergestalt (Himmlischer, Feenwesen oder Unhold – du wählst). Er greift nicht an, kann aber helfen (Hilfe-Aktion), Berührungszauber per Reaktion überbringen und teilt per Telepathie (100 ft) seine Sinne. Auf 0 TP verschwindet er. Ritual, 1 Stunde, 10 G Material. Nach den Regeln 2024 gilt ein einheitlicher Vertrauten-Statblock mit frei gewählter Tiergestalt.","Rules 2014 (SRD 5.1): a tiny spirit in animal form (celestial, fey or fiend – your choice). It cannot attack but can help (Help action), deliver touch spells as a reaction and shares its senses by telepathy (100 ft). It vanishes at 0 HP. Ritual, 1 hour, 10 gp material. The 2024 rules use one common familiar stat block with a freely chosen animal form.")));
+  const tbl=h("table",{},h("tr",{},...[T2("Tier","Animal"),"AC",T2("TP","HP"),T2("Bewegung","Speed"),"STR DEX CON INT WIS CHA",T2("Angriff","Attack"),T2("Besonderes","Notes"),""].map(x=>h("th",{},x))));
+  FAMILIAR_FORMS.forEach(f=>tbl.appendChild(h("tr",{},
+    h("td",{},h("b",{},LANG==="de"?f.de:f.en),LANG==="de"?h("span",{class:"muted small"}," ("+f.en+")"):null),h("td",{},f.ac),h("td",{},f.hp),h("td",{class:"small"},f.speed),
+    h("td",{class:"small"},f.ab.join(" · ")),h("td",{class:"small"},f.atk?f.atk[0]+" "+f.atk[1]+", "+f.atk[2]:"—"),h("td",{class:"small"},LANG==="de"?f.nde:f.nen),
+    h("td",{},c?h("button",{class:"btn btn-sm",title:T2("Als Vertrauten bei den Begleitern eintragen","Add as a familiar under Companions"),onclick:()=>{
+      c.companions=Array.isArray(c.companions)?c.companions:[];
+      c.companions.push({id:uid(),name:(LANG==="de"?f.de:f.en),kind:"familiar",creature:f.en,ac:f.ac,hp:{cur:f.hp,max:f.hp},speed:f.speed,init:"",
+        abil:{str:f.ab[0],dex:f.ab[1],con:f.ab[2],int:f.ab[3],wis:f.ab[4],cha:f.ab[5]},attacks:f.atk?[{name:f.atk[0],bonus:f.atk[1],damage:f.atk[2],notes:""}]:[],
+        notes:(LANG==="de"?f.nde:f.nen)+" "+T2("(Find Familiar, SRD 2014)","(Find Familiar, SRD 2014)"),active:true});
+      commit(); toast("🐾 "+(LANG==="de"?f.de:f.en)+" "+T2("als Vertrauter eingetragen (Reiter Begleiter)","added as familiar (Companions tab)")); }},"＋"):null))));
+  const sc=h("div",{style:"overflow-x:auto"}); sc.appendChild(tbl); wrap.appendChild(sc);
+  return wrap;
+}
 /* ---------------- TAB: Companions (Begleiter) – mounts, pets, familiars that fight along ---------------- */
 const COMP_KINDS=[["mount","Reittier","Mount"],["pet","Haustier","Pet"],["familiar","Vertrauter","Familiar"],["summon","Beschworenes Wesen","Summoned creature"],["companion","Tiergefährte","Beast companion"],["other","Sonstiges","Other"]];
 const COMP_UI={name:"",kind:"mount",best:""};
@@ -4379,6 +4428,7 @@ function tabCompanions(c){
   wrap.appendChild(h("div",{class:"card"},h("h2",{style:"margin:0 0 6px"},"🐾 "+t("tabCompanions")),
     h("p",{class:"muted small",style:"margin:0 0 10px"},T2("Mitkämpfende Reittiere, Haustiere, Vertraute oder Beschworene. Optional übernimmst du Trefferpunkte, Rüstungsklasse, Werte und Angriffe aus dem Bestiarium; alles lässt sich danach ändern.","Mounts, pets, familiars or summons that fight alongside you. Optionally take hit points, armor class, abilities and attacks from the bestiary; everything can be edited afterwards.")),
     h("div",{class:"row",style:"gap:8px;flex-wrap:wrap;align-items:center"},nameIn,kind,best,h("button",{class:"btn btn-primary",onclick:()=>{ COMP_UI.name=nameIn.value; compAdd(c); }},"＋ "+T2("Eintragen","Add")))));
+  wrap.appendChild(h("details",{class:"card",style:"margin-top:10px"},h("summary",{style:"cursor:pointer;font-weight:600"},"🐾 "+T2("Vertrauten finden (Find Familiar) – die 15 möglichen Tiere","Find Familiar – the 15 possible forms")),familiarTable(c)));
   if(!c.companions.length) wrap.appendChild(h("p",{class:"muted",style:"padding:8px 2px"},T2("Noch kein Begleiter eingetragen.","No companions yet.")));
   c.companions.forEach(p=>wrap.appendChild(compCard(c,p)));
   return wrap;
@@ -4592,6 +4642,7 @@ function spellRow(c,s){
   const body=h("div",{class:"sp-body"});
   body.appendChild(h("div",{class:"small muted"},t("castingTime")+": "+s.time+" · "+t("range")+": "+s.range+" · "+t("components")+": "+s.comp+" · "+t("duration")+": "+s.duration));
   { const sc=spellCost(s); if(sc) body.appendChild(h("div",{class:"small",style:"margin-top:4px;color:var(--gold)"},"💰 "+T2("Kosten (Material): ","Cost (material): ")+sc.text)); }
+  if(s.id==="find-familiar") body.appendChild(h("details",{style:"margin-top:6px"},h("summary",{style:"cursor:pointer;font-weight:600"},"🐾 "+T2("Mögliche Tiere & Werte (15)","Possible forms & stats (15)")),familiarTable(CHARS.find(x=>x.id===CURRENT)||null)));
   body.appendChild(h("div",{class:"small",style:"margin-top:4px"},L(s.sum||{en:""})+spellExtra(CHARS.find(x=>x.id===CURRENT)||{},s)));
   if(isC||isK||isP) body.appendChild(ta(c.spellNotes[s.id]||"",v=>{ c.spellNotes[s.id]=v; saveChars(); }));
   it.appendChild(body);
