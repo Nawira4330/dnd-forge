@@ -40,6 +40,58 @@
   .ds-dot{width:20px;height:20px;border-radius:50%;border:2px solid var(--line);background:transparent;padding:0;cursor:pointer}
   .ds-dot.ok.on{background:var(--good);border-color:var(--good)} .ds-dot.bad.on{background:var(--bad);border-color:var(--bad)}
   .bk-ink{--c:#3b3b6b;--h:92px}
+  .bk-map{--c:#2f5d4e;--h:84px}
+  .shelf:not(.tools) .book:not(.bk-diary){min-width:21px}
+  html[data-zoom="115"]{--zf:1.15} html[data-zoom="130"]{--zf:1.3} html[data-zoom="150"]{--zf:1.5}
+  .map-box{position:relative;margin-top:8px;height:max(380px,calc((100vh - 250px) / var(--zf,1)));border:1px solid var(--line);border-radius:var(--radius);background:#1a1a1a;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none;cursor:grab}
+  .map-box.mode-pin,.map-box.mode-text{cursor:crosshair}
+  .map-stage{position:absolute;left:0;top:0;transform-origin:0 0;will-change:transform}
+  .map-img{display:block;width:100%;height:100%;pointer-events:none;-webkit-user-drag:none}
+  .map-marks{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+  .map-mark{position:absolute;pointer-events:auto;cursor:pointer}
+  .map-mark.pin{width:0;height:0}
+  .map-pin{position:absolute;left:-15px;top:-38px;width:30px;height:30px;box-sizing:border-box;border-radius:50%;background:var(--c);border:2px solid #fff;box-shadow:0 1px 5px rgba(0,0,0,.65);display:flex;align-items:center;justify-content:center;font-size:16px;line-height:1}
+  .map-pin::after{content:"";position:absolute;left:50%;top:100%;margin-left:-6px;border:6px solid transparent;border-top:9px solid var(--c);border-bottom:0}
+  .map-lab{position:absolute;left:19px;top:-34px;white-space:nowrap;background:rgba(15,15,15,.8);color:#fff;font:600 12px system-ui,sans-serif;padding:2px 7px;border-radius:6px;pointer-events:none}
+  .map-mark.sel .map-pin{box-shadow:0 0 0 3px var(--gold),0 1px 5px rgba(0,0,0,.65)}
+  .map-mark.txt{transform:translate(-50%,-50%);width:max-content;max-width:240px;background:rgba(255,248,225,.95);color:#2a2113;border:2px solid var(--c);border-radius:8px;padding:5px 9px;font:500 13px/1.3 system-ui,sans-serif;box-shadow:0 2px 6px rgba(0,0,0,.5)}
+  .map-mark.txt.sz0{font-size:11px;max-width:200px} .map-mark.txt.sz2{font-size:18px;max-width:320px}
+  .map-mark.txt.sel{outline:3px solid var(--gold)}
+  .map-note{white-space:pre-wrap}
+  .map-edit{position:absolute;right:8px;top:8px;width:min(330px,calc(100% - 16px));max-height:calc(100% - 16px);overflow:auto;display:none;z-index:6;background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:var(--radius);padding:10px;box-shadow:0 6px 20px rgba(0,0,0,.45);cursor:default;user-select:text;-webkit-user-select:text}
+  .map-zoomctl{position:absolute;left:8px;bottom:8px;display:flex;gap:4px;align-items:center;z-index:5}
+  .map-zlab{min-width:46px;text-align:center;font:700 12px system-ui,sans-serif;color:#fff;background:rgba(15,15,15,.75);border-radius:6px;padding:5px 4px}
+  .map-compass{position:absolute;left:8px;top:8px;width:64px;height:64px;z-index:5;cursor:pointer}
+  .map-hint{position:absolute;left:50%;top:8px;transform:translateX(-50%);z-index:5;display:none;background:rgba(15,15,15,.85);color:#fff;font:600 13px system-ui,sans-serif;padding:6px 12px;border-radius:999px;pointer-events:none;white-space:nowrap;max-width:calc(100% - 100px);overflow:hidden;text-overflow:ellipsis}
+  .map-empty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:#ddd;text-align:center;padding:20px;z-index:3}
+  .map-icons{display:flex;flex-wrap:wrap;gap:4px}
+  .map-ic{width:34px;height:34px;font-size:18px;line-height:1;border:1px solid var(--line);border-radius:8px;background:var(--panel2);cursor:pointer;padding:0}
+  .map-ic.on{border-color:var(--gold);box-shadow:0 0 0 2px var(--gold)}
+  .map-swatch{width:28px;height:28px;border-radius:50%;border:2px solid var(--line);padding:0;cursor:pointer}
+  .map-swatch.on{border-color:var(--gold);box-shadow:0 0 0 2px var(--gold)}
+  .map-row{display:flex;gap:8px;align-items:center;width:100%;margin-top:6px;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--panel2);color:var(--text);cursor:pointer;font:inherit}
+  .map-rowic{width:28px;height:28px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;flex:none;font-size:15px;border:2px solid #fff;box-sizing:border-box}
+  .map-marks.lo .map-lab:not(.party-lab){display:none}
+  .map-areas{position:absolute;left:0;top:0;pointer-events:none}
+  .map-mark.pin,.map-mark.txt{z-index:2}
+  .map-mark.alab{transform:translate(-50%,-50%);width:max-content;background:none;border:0;padding:0;color:#fff;font:700 15px/1.05 Georgia,"Times New Roman",serif;letter-spacing:.08em;text-shadow:-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,1px 1px 0 #000,0 0 10px rgba(0,0,0,.85),0 0 5px var(--c);white-space:nowrap;z-index:0;opacity:.94}
+  .map-mark.alab.pen{background:rgba(15,15,15,.62);border:2px solid var(--c);border-radius:999px;padding:3px 12px;font-size:14px;letter-spacing:.04em;max-width:260px;text-shadow:0 1px 2px #000;z-index:1;opacity:1}
+  .map-mark.alab.sel{outline:2px dashed var(--gold);outline-offset:4px}
+  .map-paintbar{display:none;gap:6px;flex-wrap:wrap;align-items:center;margin-top:8px;padding:8px;border:1px solid var(--line);border-radius:var(--radius);background:var(--panel2)}
+  .map-svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:hidden}
+  .map-mark.party{width:0;height:0;z-index:3}
+  .map-party{position:absolute;left:-19px;top:-19px;width:38px;height:38px;box-sizing:border-box;border-radius:50%;background:#f1c40f;border:3px solid #7a5b00;display:flex;align-items:center;justify-content:center;font-size:20px;line-height:1;animation:mapPulse 2s infinite}
+  @keyframes mapPulse{0%{box-shadow:0 0 0 0 rgba(241,196,15,.75)}70%{box-shadow:0 0 0 18px rgba(241,196,15,0)}100%{box-shadow:0 0 0 0 rgba(241,196,15,0)}}
+  .map-lab.party-lab{left:25px;top:-11px;background:#f1c40f;color:#2a2113}
+  .map-mark.party.sel .map-party{outline:3px solid var(--gold)}
+  .map-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+  .map-fld{display:flex;flex-direction:column;gap:2px}
+  .map-sum{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;margin-top:10px}
+  .map-sum>div{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:6px 10px;display:flex;flex-direction:column}
+  .map-sum b{font-size:17px}
+  .map-warn{margin-top:8px;padding:8px 10px;border:1px solid var(--bad);border-radius:8px;background:rgba(200,60,50,.08)}
+  .map-legs{margin-top:6px;display:flex;flex-direction:column;gap:4px}
+  .map-leg{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
   .ink-bar{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
   .ink-sticky{position:sticky;top:0;z-index:20;background:var(--bg);padding:8px 0;border-bottom:1px solid var(--line);margin-top:8px}
   .ink-page{margin-top:8px;max-width:1000px;border:1px solid var(--line);border-radius:var(--radius);background:var(--panel);overflow:auto}
@@ -325,7 +377,7 @@
   .diary.btn-primary{box-shadow:0 0 0 2px var(--gold),0 3px 7px rgba(0,0,0,.55),inset -3px 0 0 rgba(212,175,55,.8)}
   @media(pointer:coarse),(hover:none){.book{width:44px}.book.bk-help{width:36px}.shelf{gap:4px}}
   /* Qualfas Tagebuch: its own leather diary with clasp and ribbon, leaning against the books */
-  .book.bk-diary{--c:#4a2f1a;--h:156px;width:40px;min-width:30px;margin-left:4px;transform:rotate(4deg);transform-origin:bottom left}
+  .book.bk-diary{--c:#4a2f1a;--h:156px;width:40px;min-width:30px;margin-left:0;transform:rotate(4deg);transform-origin:bottom left}
   .book.bk-diary:hover{transform:rotate(4deg) translateY(-5px)}
   .book.bk-diary.btn-primary{transform:rotate(2deg) translateY(-10px)}
   .book.bk-diary .bt{font-size:11px;letter-spacing:.03em}
@@ -452,6 +504,7 @@ html[data-zoom="150"] #main .pp-img{width:110px}
         <button class="book bk-people" id="btnPeople" title="NPC Register"><span class="bi">📜</span><span class="bt">NPC Register</span></button>
         <button class="book bk-log" id="btnLog" title="Spiellog"><span class="bi">📓</span><span class="bt">Spiellog</span></button>
         <button class="book bk-lex" id="btnBooks" title="Lexikon"><span class="bi">📚</span><span class="bt">Lexikon</span></button>
+        <button class="book bk-map" id="btnMap" title="Karten – Landkarte mit Zoom, Markierungen und Hinweistexten"><span class="bi">🗺</span><span class="bt">Karten</span></button>
         <button class="book bk-ink" id="btnInk" title="Handnotizen – mit dem Stift schreiben und zeichnen"><span class="bi">✍</span><span class="bt">Handnotizen</span></button>
         <button class="book bk-diary" id="btnQualfa" title="Qualfas Tagebuch"><span class="bi">📔</span><span class="bt">Qualfas Tagebuch</span></button>
       </div>
@@ -606,7 +659,7 @@ html[data-zoom="150"] #main .pp-img{width:110px}
 /* ---------- Online-Abgleich (nur in der Online-Version): localStorage <-> private Datenbank ---------- */
 (function(){
   "use strict";
-  const SYNC=/^dnd_(characters_v1|ink_v1|homebrew_v1|group_v1|bestiary_v1|people_v1|sessions_v1|books_v1|seeded_books|seeded_people|seeded_chars|seeded_fenn|seeded_itemsen|seeded_sheet1|seeded_sheet2|seeded_sheet3|seeded_sheet4|seeded_sheet5|seeded_sheet6|seeded_sheet7|seeded_sheet8|seeded_sheet9|seeded_sheet10|seeded_sheet11|seeded_sheet12|seeded_sheet13)$/;
+  const SYNC=/^dnd_(characters_v1|ink_v1|maps_v1|mapimg_v1|homebrew_v1|group_v1|bestiary_v1|people_v1|sessions_v1|books_v1|seeded_books|seeded_people|seeded_chars|seeded_fenn|seeded_itemsen|seeded_sheet1|seeded_sheet2|seeded_sheet3|seeded_sheet4|seeded_sheet5|seeded_sheet6|seeded_sheet7|seeded_sheet8|seeded_sheet9|seeded_sheet10|seeded_sheet11|seeded_sheet12|seeded_sheet13)$/;
   const HASHK="dnd_sync_hash", META="dnd_sync_meta", DEVK="dnd_sync_dev", PEND="dnd_sync_pending", CHUNK=60000;
   const ls=window.localStorage;
   const rawSet=Storage.prototype.setItem, rawRemove=Storage.prototype.removeItem;
@@ -7817,13 +7870,14 @@ function render(){
   renderSidebar();
   $$("[data-i]").forEach(el=>{ el.textContent=t(el.getAttribute("data-i")); });
   const main=$("#main"); main.innerHTML="";
-  [["btnBestiary","bestiary"],["btnPeople","people"],["btnLog","log"],["btnBooks","books"],["btnInk","ink"],["btnQualfa","diary"]].forEach(([id,v])=>{ const e=$("#"+id); if(e) e.classList.toggle("btn-primary",state.view===v); });   // the book of the open view is pulled out of the shelf
+  [["btnBestiary","bestiary"],["btnPeople","people"],["btnLog","log"],["btnBooks","books"],["btnMap","map"],["btnInk","ink"],["btnQualfa","diary"]].forEach(([id,v])=>{ const e=$("#"+id); if(e) e.classList.toggle("btn-primary",state.view===v); });   // the book of the open view is pulled out of the shelf
   const bb=$("#btnBestiary"); if(bb) bb.classList.toggle("btn-primary",state.view==="bestiary");
   if(state.view==="bestiary"){ try{ main.appendChild(bestiaryView()); }catch(err){ main.appendChild(h("div",{class:"card"},h("pre",{class:"small"},String(err&&err.stack||err)))); } return; }
   const pb=$("#btnPeople"); if(pb) pb.classList.toggle("btn-primary",state.view==="people");
   if(state.view==="people"){ try{ main.appendChild(peopleView()); }catch(err){ main.appendChild(h("div",{class:"card"},h("pre",{class:"small"},String(err&&err.stack||err)))); } return; }
   const lb=$("#btnLog"); if(lb) lb.classList.toggle("btn-primary",state.view==="log");
   if(state.view==="log"){ try{ main.appendChild(slogView()); }catch(err){ main.appendChild(h("div",{class:"card"},h("pre",{class:"small"},String(err&&err.stack||err)))); } return; }
+  if(state.view==="map"){ try{ main.appendChild(mapView()); }catch(err){ main.appendChild(h("div",{class:"card"},h("pre",{class:"small"},String(err&&err.stack||err)))); } return; }
   if(state.view==="ink"){ try{ main.appendChild(inkView()); }catch(err){ main.appendChild(h("div",{class:"card"},h("pre",{class:"small"},String(err&&err.stack||err)))); } return; }
   const kb=$("#btnBooks"); if(kb) kb.classList.toggle("btn-primary",state.view==="books");
   const qb=$("#btnQualfa"); if(qb) qb.classList.toggle("btn-primary",state.view==="diary");
@@ -8308,7 +8362,7 @@ function peopleDetail(e){
   const app=document.getElementById("app"), tg=document.getElementById("sideToggle"), sc=document.getElementById("sideScrim"), sb=document.querySelector(".sidebar");
   if(tg) tg.addEventListener("click",()=>app.classList.toggle("side-open"));
   const topT=document.getElementById("topTitle"), _rs=renderSidebar;
-  renderSidebar=function(){ _rs.apply(this,arguments); if(topT){ const c=curChar(); topT.textContent=state.view==="bestiary"?"📖 "+T2("Bestiarium","Bestiary"):state.view==="people"?"📜 "+T2("NPC Register","NPC register"):state.view==="log"?"📓 "+T2("Spiellog","Session log"):state.view==="books"?"📚 Lexikon":state.view==="diary"?"📔 Qualfas Tagebuch":state.view==="ink"?"✍ "+T2("Handnotizen","Handwritten notes"):(c&&c.name)||"D&D Forge"; } };
+  renderSidebar=function(){ _rs.apply(this,arguments); if(topT){ const c=curChar(); topT.textContent=state.view==="bestiary"?"📖 "+T2("Bestiarium","Bestiary"):state.view==="people"?"📜 "+T2("NPC Register","NPC register"):state.view==="log"?"📓 "+T2("Spiellog","Session log"):state.view==="books"?"📚 Lexikon":state.view==="diary"?"📔 Qualfas Tagebuch":state.view==="map"?"🗺 "+T2("Karten","Maps"):state.view==="ink"?"✍ "+T2("Handnotizen","Handwritten notes"):(c&&c.name)||"D&D Forge"; } };
   if(sc) sc.addEventListener("click",()=>app.classList.remove("side-open"));
   if(sb) sb.addEventListener("click",e=>{ if(e.target.closest("button,.char-item")) setTimeout(()=>app.classList.remove("side-open"),50); });   // choosing something closes the menu
   try{ const cv=document.createElement("canvas"); cv.width=cv.height=180; const g=cv.getContext("2d");
@@ -8954,6 +9008,502 @@ function inkView(){
   return wrap;
 }
 
+/* ---------------- Karten: Landkarte mit Zoom, Markierungen, Hinweistexten, Reisemarker und Lineal mit Reisezeit ---------------- */
+const MAP_PACK="";
+let MAPS=Object.assign({maps:[],sel:"",seeded:0},loadJSON(MAP_KEY)||{}); if(!Array.isArray(MAPS.maps)) MAPS.maps=[];
+let MAPIMG=loadJSON(MAPIMG_KEY)||{}; if(typeof MAPIMG!=="object"||Array.isArray(MAPIMG)) MAPIMG={};
+function saveMaps(){ try{ localStorage.setItem(MAP_KEY,JSON.stringify(MAPS)); return true; }
+  catch(e){ toast("⚠ "+T2("Speicher voll – bitte Backup-Datei speichern","Storage full – please save a backup file")); return false; } }
+function saveMapImg(){ try{ localStorage.setItem(MAPIMG_KEY,JSON.stringify(MAPIMG)); return true; }
+  catch(e){ toast("⚠ "+T2("Speicher voll – das Kartenbild passt nicht mehr hinein","Storage full – the map image no longer fits")); return false; } }
+/* places read from Lisa's hand-annotated map (positions are fractions of the picture: x = right, y = down; ids are fixed so that nothing is added twice) */
+const MAP_SEED=(()=>{
+  const n=(ax,ay)=>({x:Math.round((ax+66)/1546*10000)/10000,y:Math.round(ay/2000*10000)/10000}), R="#d64541", Y="#f1c40f", B="#3498db", G="#2ecc71";
+  const sp=(id,ax,ay,title,ic,c,note)=>Object.assign({id:"seed_"+id,t:"pin",title,note:note||"",ic,c},n(ax,ay));
+  const st=(id,ax,ay,title,c,sz,note)=>Object.assign({id:"seed_"+id,t:"text",title,note:note||"",c,sz},n(ax,ay));
+  return [
+    sp("alt_tabolon",826,842,"Alt-Tabolon","🏘",R,"Siedlung auf der „Zunge“, neben der Brücke."),
+    sp("tabolon2",843,927,"Siedlung (Name unklar)","❓",R,"Zweite Siedlung auf der Zunge. Daneben steht rot eine kaum lesbare Beschriftung (Bruderschaft? / Ruine / Schloss?)."),
+    sp("leiter",822,990,"Grünes Leiter-Symbol (unklar)","❓",G,"Grünes Symbol am Südufer der Zunge, neben der Beschriftung der zweiten Siedlung."),
+    sp("bruecke",892,811,"Brücke (Name unklar)","📍",R,"Brücke über den Fluss. Rote Handschrift („Eisbrück…“?) und ein roter Pfeil mit einem Wort, das ich nicht lesen kann."),
+    sp("knoten_bruecke",918,788,"Magischer Knotenpunkt","🔮",Y,"Gelber Stern direkt neben der Brücke."),
+    sp("knoten_wild",553,278,"Knotenpunkt der wilden Magie","🔮",Y),
+    sp("hoehle",627,1540,"Höhleneingang (Name unklar)","🕳",Y,"Gelber Knotenpunkt mit grünem Haken (✓). Text: „Eingang zur … Höhle“ – der Name ist unleserlich (Goldblatts? dichtbei?). Der grüne Haken bedeutet vermutlich: schon besucht/erledigt."),
+    sp("trauerbrunn",1150,1090,"Trauerbrunn","🏘",R),
+    sp("walen",1210,1440,"Walen","🏘",R),
+    sp("ringfeld",1030,1748,"Ringfeld","🏘",R),
+    sp("ferner_auen",758,1905,"Ferner Auen","🏘",R),
+    sp("hundburgen",670,1872,"Hundburgen (?)","🏘",R,"Schreibweise unsicher (Brandburgen? Bandburgen?)."),
+    sp("myrthora",450,1390,"Myrthora","🏛",R,"Ruinenstadt im Süden."),
+    sp("schrein1",308,1130,"Schrein 1 – Drachenschrein","🏛",R,"Rote Stern-Markierung „1“. Legende: 1 Drachenschrein."),
+    sp("schrein2",290,1060,"Pilgerort – Schrein 2 (Gottesstein)","🏛",R,"Rote Wolke mit Stern „2“ und dem Wort in Anführungszeichen darunter. Legende: 2 Gottesstein."),
+    sp("schrein3",632,1067,"Schrein 3 – Dämonen…schrein","🏛",R,"Rote Stern-Markierung „3“. Legende: „Dämonengauer Schrein“ – die Schreibweise ist unleserlich."),
+    sp("person_schilf",365,1005,"Person im Schilf","👤",B,"Blaues Männchen-Symbol (Legende: Person im Schilf)."),
+    sp("turm",742,1220,"Turm","🏰",B,"Blauer Pfeil (Legende: Turm)."),
+    sp("ruine_sumpfsee",545,1315,"Ruine & Sumpfsee","🌊",B,"Blau schraffiert (Legende: Ruine & Sumpfsee). Daneben steht rot ein kleines Wort, das ich nicht lesen kann."),
+    sp("seichtwasser",510,1038,"Seichtwasser","🌊",R),
+    sp("fluten",1020,1170,"Furt? (Name unklar)","❓",G,"Grüner Kreis am Fluss mit rotem Wort darüber (Fluten? Fliesen? Furt?)."),
+    sp("bullyburg",900,1295,"Bullyburg Dorf (?)","❓",R,"Rote Beschriftung mit Fragezeichen davor."),
+    sp("goblin",995,1305,"Goblin-Dorf (?)","🏕",G,"Grünes „M“-Symbol mit sehr kleiner Beschriftung (Goblin Dorf?)."),
+    sp("rotes_symbol",68,1100,"Rotes Symbol (unklar)","❓",R,"Kleines rotes Bild am linken Kartenrand (Hütte? Turm?)."),
+    st("winterwald",1110,395,"Winterwald",G,1),
+    st("zunge",660,835,"Zunge",R,1),
+    st("drachental",140,1423,"Drachental",R,1),
+    st("rauchtal",165,1133,"Rauchtal (?)",R,1)
+  ];
+})();
+if(!MAPS.seeded){ MAPS.seeded=1; if(!MAPS.maps.some(m=>m.id==="map_myrthora")) MAPS.maps.unshift({id:"map_myrthora",name:"Myrthora Tavolon",img:"builtin",marks:[],ts:Date.now(),upd:Date.now()}); saveMaps(); }
+if(MAPS.seeded<2){ MAPS.seeded=2; const mm=MAPS.maps.find(m=>m.id==="map_myrthora"); if(mm){ if(!Array.isArray(mm.marks)) mm.marks=[]; MAP_SEED.forEach(s=>{ if(!mm.marks.some(x=>x.id===s.id)) mm.marks.push(s); }); } saveMaps(); }
+const MAP_UI={mode:"move",lock:false,labels:true,edit:"",q:"",scalePts:[],area:"",tool:"paint",bs:3}, MAP_VIEW={}, MAP_DIM={};
+const MAP_COLORS=["#d64541","#e67e22","#f1c40f","#2ecc71","#1abc9c","#3498db","#9b59b6","#ecf0f1","#2c2c2c"];
+const MAP_ICONS=["📍","🏰","🏘","🏛","⚔","💀","⭐","❓","❗","🏕","⛰","🌲","💰","🐉","⚓","🕳","🍺","🔮","📜","🚪","🌊","🔥","👤","🧭"];
+const mapNorth=m=>m.north==null?(m.id==="map_myrthora"?270:0):m.north;   // direction of north on the screen, degrees clockwise from "up" (here: the top of the picture is east, so north = left)
+const mapMpw=m=>m.mpw||(m.id==="map_myrthora"?111.2:100);   // miles across the full width of the picture (Myrthora: the red 100-mile bar covers about 90 % of the width)
+const MAP_TERR=[["road","Weg / Straße / offenes Land","Road / open country",1],["rough","Wald, Hügel, Sumpf (schwieriges Gelände)","Forest, hills, swamp (difficult terrain)",0.5],["mount","Gebirge / dichter Urwald","Mountains / dense jungle",0.33]];
+const MAP_PACE=[["slow","Langsam (2 mi/h bei 30 ft)","Slow (2 mph at 30 ft)",2/3],["normal","Normal (3 mi/h bei 30 ft)","Normal (3 mph at 30 ft)",1],["fast","Schnell (4 mi/h bei 30 ft)","Fast (4 mph at 30 ft)",4/3]];
+const MAP_TRAVEL_DEF={ft:30,pace:"normal",hours:8,breaks:1,breakH:1,restH:8,start:8,con:2,exh:0,manual:0,fromParty:true};
+const mapCur=()=>MAPS.maps.find(m=>m.id===MAPS.sel)||MAPS.maps[0]||null;
+const mapSrc=m=>(m&&(MAPIMG[m.id]||(m.img==="builtin"&&MAP_PACK?MAP_PACK:"")))||"";
+let mapSaveT=null; const mapSaveSoon=()=>{ clearTimeout(mapSaveT); mapSaveT=setTimeout(saveMaps,350); };
+/* a picture is shrunk to at most 2400 px and stored as JPEG so that it stays light for the online sync */
+function mapReadImage(file,cb){
+  const bad=()=>toast("⚠ "+T2("Das Bild konnte nicht gelesen werden","The image could not be read"));
+  const fr=new FileReader(); fr.onerror=bad;
+  fr.onload=()=>{ const im=new Image(); im.onerror=bad; im.onload=()=>{ const k=Math.min(1,2400/Math.max(im.naturalWidth,im.naturalHeight)), cv=document.createElement("canvas"); cv.width=Math.max(1,Math.round(im.naturalWidth*k)); cv.height=Math.max(1,Math.round(im.naturalHeight*k)); cv.getContext("2d").drawImage(im,0,0,cv.width,cv.height); cb(cv.toDataURL("image/jpeg",0.88)); }; im.src=fr.result; };
+  fr.readAsDataURL(file);
+}
+function mapPickImage(cb){
+  const inp=h("input",{type:"file",accept:"image/*",style:"display:none"});
+  inp.addEventListener("change",()=>{ const f=inp.files&&inp.files[0]; inp.remove(); if(f) mapReadImage(f,u=>cb(u,f.name.replace(/\.[^.]+$/,""))); });
+  inp.addEventListener("cancel",()=>inp.remove()); document.body.appendChild(inp); inp.click();
+}
+function mapWrap(g,text,maxW){ const out=[]; String(text||"").split("\n").forEach(par=>{ let line=""; par.split(" ").forEach(w=>{ const t=line?line+" "+w:w; if(line&&g.measureText(t).width>maxW){ out.push(line); line=w; } else line=t; }); out.push(line); }); return out; }
+/* ---- painted areas: strokes are stored as vectors (fractions of the picture); every area is painted opaque on its own layer and then laid over the map transparently, so overlaps do not get darker ---- */
+const MAP_BRUSH=[0.003,0.006,0.012,0.025,0.05,0.09];
+const MAP_BB=new WeakMap();
+function mapAreaBB(a){ const c=MAP_BB.get(a); if(c&&c.n===a.strokes.length) return c.bb; let x0=2,y0=2,x1=-1,y1=-1; a.strokes.forEach(st=>st.p.forEach(q=>{ x0=Math.min(x0,q[0]); x1=Math.max(x1,q[0]); y0=Math.min(y0,q[1]); y1=Math.max(y1,q[1]); })); const bb=x1<x0?null:{x0,y0,x1,y1}; MAP_BB.set(a,{n:a.strokes.length,bb}); return bb; }
+/* lettering of a painted area: as big as fits into the field (one line), never bigger than its height allows */
+function mapAreaFs(a,wPx,hPx,cap){ const len=Math.max(2,(a.name||"").length); return Math.min(0.9*wPx/(len*0.66),0.55*hPx,cap); }
+function mapStrokePath(t,s,w,h){ const p=s.p; t.lineWidth=Math.max(1,s.w*w); if(p.length===1){ t.beginPath(); t.arc(p[0][0]*w,p[0][1]*h,t.lineWidth/2,0,6.2832); t.fill(); return; } t.beginPath(); t.moveTo(p[0][0]*w,p[0][1]*h); for(let i=1;i<p.length;i++) t.lineTo(p[i][0]*w,p[i][1]*h); t.stroke(); }
+function mapAreasTo(g,w,h,areas,store,live){
+  let scratch=null;
+  (areas||[]).forEach(a=>{
+    const key=a.c+"|"+a.strokes.length+"|"+w; let ent=store&&store[a.id];
+    if(!ent||ent.key!==key){ const cv=ent?ent.cv:document.createElement("canvas"); cv.width=w; cv.height=h; const t=cv.getContext("2d"); t.strokeStyle=a.c; t.fillStyle=a.c; t.lineCap="round"; t.lineJoin="round"; a.strokes.forEach(st=>mapStrokePath(t,st,w,h)); ent={cv,key}; if(store) store[a.id]=ent; }
+    let src=ent.cv;
+    if(live&&live.a===a&&live.s&&live.s.p.length){ if(!scratch){ scratch=document.createElement("canvas"); scratch.width=w; scratch.height=h; } const t=scratch.getContext("2d"); t.clearRect(0,0,w,h); t.drawImage(ent.cv,0,0); t.strokeStyle=a.c; t.fillStyle=a.c; t.lineCap="round"; t.lineJoin="round"; mapStrokePath(t,live.s,w,h); src=scratch; }
+    g.globalAlpha=a.al==null?0.38:a.al; g.drawImage(src,0,0); g.globalAlpha=1;
+  });
+}
+/* ---- travel time: pure calculation, no screen ---- */
+function mapRouteLegs(m,W,H){
+  const tv=Object.assign({},MAP_TRAVEL_DEF,m.travel||{}), party=(m.marks||[]).find(x=>x.t==="party"), mpw=mapMpw(m), route=m.route||[];
+  const pts=(tv.fromParty&&party&&route.length?[{x:party.x,y:party.y}]:[]).concat(route), legs=[];
+  for(let i=1;i<pts.length;i++){ const a=pts[i-1], b=pts[i], mi=Math.hypot((a.x-b.x)*W,(a.y-b.y)*H)/W*mpw, tr=MAP_TERR.find(t=>t[0]===(b.t||"road"))||MAP_TERR[0]; legs.push({a,b,mi,tr}); }
+  return {legs,pts,total:legs.reduce((s,l)=>s+l.mi,0)};
+}
+function mapTravelCalc(m,miles,legs){
+  const tv=Object.assign({},MAP_TRAVEL_DEF,m.travel||{}), pace=(MAP_PACE.find(p=>p[0]===tv.pace)||MAP_PACE[1])[3], mph=Math.max(0.1,tv.ft/10*pace);
+  const hoursOf=(l)=>l.mi/(mph*l.tr[3]);
+  let T=legs.length?legs.reduce((s,l)=>s+hoursOf(l),0):miles/mph;
+  const H=Math.max(1,tv.hours), rows=[]; let remaining=T, day=1, clock=tv.start, warn="";
+  const dayLen=H+tv.breaks*tv.breakH; if(dayLen+tv.restH>24) warn=T2("Marsch + Pausen + Nachtruhe sind zusammen länger als 24 Stunden – so geht der Tag nicht auf.","March + breaks + night rest add up to more than 24 hours – the day does not fit.");
+  let guard=0, arrive=null, exDays=[]; // exDays: extra marching hours beyond 8 of every day
+  while(remaining>1e-9&&guard++<400){
+    const march=Math.min(H,remaining), nb=Math.round(tv.breaks*march/H), len=march+nb*tv.breakH, start=clock, end=start+len;
+    rows.push({day,start,end,march,breaks:nb,mi:0});
+    exDays.push(Math.max(0,march-8)); remaining-=march; if(remaining<=1e-9){ arrive={day,t:end}; break; } day++; clock=tv.start; }
+  // miles per day: proportional to hours (legs may differ in speed)
+  rows.forEach(r=>{ r.mi=T>0?miles*r.march/T:0; });
+  // forced march: Constitution save after every hour beyond 8 (DC 10 + number of extra hours); her house rule: -1 to every roll per exhaustion level; a long rest lowers exhaustion by 1
+  const dist=new Array(7).fill(0); dist[Math.max(0,Math.min(6,Math.round(tv.exh)))]=1; let forced=false;
+  exDays.forEach((ex,di)=>{
+    if(ex>0.0001){ forced=true; const whole=Math.floor(ex+1e-9), frac=ex-whole;
+      for(let i=1;i<=whole+(frac>0.05?1:0);i++){ const dc=10+i, w=(i<=whole?1:frac);
+        for(let l=5;l>=0;l--){ if(!dist[l]) continue; const pass=Math.max(0,Math.min(1,(21-(dc-tv.con+l))/20)), fail=(1-pass)*w; dist[l+1]+=dist[l]*fail; dist[l]-=dist[l]*fail; } } }
+    if(di<exDays.length-1){ for(let l=1;l<=5;l++){ dist[l-1]+=dist[l]; dist[l]=0; } /* long rest: -1 level (levels 0 stays 0) */ }
+  });
+  const exp=dist.reduce((s,p,l)=>s+p*l,0);
+  return {mph,T,rows,arrive,days:rows.length,nights:Math.max(0,rows.length-1),warn,forced,dist,exp,H};
+}
+const nf=x=>(Math.round(x*10)/10).toLocaleString(LANG==="de"?"de-DE":"en-GB");
+const mapClock=t=>{ const tt=((t%24)+24)%24, hh=Math.floor(tt), mm=Math.round((tt-hh)*60); return String(mm===60?hh+1:hh).padStart(2,"0")+":"+String(mm===60?0:mm).padStart(2,"0"); };
+function mapExportPng(m){
+  const src=mapSrc(m), im=new Image();
+  im.onload=()=>{
+    const W=im.naturalWidth, H=im.naturalHeight, cv=document.createElement("canvas"); cv.width=W; cv.height=H; const g=cv.getContext("2d"); g.drawImage(im,0,0); const u=Math.max(W,H)/1000;
+    mapAreasTo(g,W,H,m.areas);
+    (m.areas||[]).forEach(a=>{ if(!a.name||a.lab.hide) return; const x=a.lab.x*W, y=a.lab.y*H; g.textAlign="center"; g.textBaseline="middle";
+      if(a.kind==="pen"){ g.font="700 "+(14*u)+"px Georgia,serif"; const tw=g.measureText(a.name).width, bw=tw+26*u, bh=24*u; g.fillStyle="rgba(15,15,15,.62)"; g.strokeStyle=a.c; g.lineWidth=2*u; g.beginPath(); g.roundRect?g.roundRect(x-bw/2,y-bh/2,bw,bh,bh/2):g.rect(x-bw/2,y-bh/2,bw,bh); g.fill(); g.stroke(); g.fillStyle="#fff"; g.fillText(a.name,x,y+u); }
+      else{ const bb=mapAreaBB(a), fs=bb?mapAreaFs(a,(bb.x1-bb.x0)*W,(bb.y1-bb.y0)*H,120*u):16*u; if(fs<9*u) return; g.font="700 "+fs+"px Georgia,serif"; g.lineJoin="round"; g.lineWidth=Math.max(2,fs/7); g.strokeStyle="rgba(0,0,0,.85)"; g.strokeText(a.name,x,y); g.fillStyle="#fff"; g.fillText(a.name,x,y); }
+      g.textAlign="left"; });
+    const rl=mapRouteLegs(m,W,H);
+    if((m.trail||[]).length){ const party=m.marks.find(x=>x.t==="party"), tp=(m.trail||[]).concat(party?[party]:[]); g.strokeStyle="#f1c40f"; g.lineWidth=2.5*u; g.setLineDash([2*u,6*u]); g.beginPath(); tp.forEach((p,i)=>i?g.lineTo(p.x*W,p.y*H):g.moveTo(p.x*W,p.y*H)); g.stroke(); g.setLineDash([]); }
+    if(rl.pts.length>1){ g.lineJoin="round"; g.strokeStyle="rgba(0,0,0,.65)"; g.lineWidth=6*u; g.beginPath(); rl.pts.forEach((p,i)=>i?g.lineTo(p.x*W,p.y*H):g.moveTo(p.x*W,p.y*H)); g.stroke(); g.strokeStyle="#ffd24a"; g.lineWidth=3*u; g.setLineDash([8*u,5*u]); g.beginPath(); rl.pts.forEach((p,i)=>i?g.lineTo(p.x*W,p.y*H):g.moveTo(p.x*W,p.y*H)); g.stroke(); g.setLineDash([]);
+      g.font="700 "+(12*u)+"px system-ui,sans-serif"; g.textAlign="center"; g.textBaseline="middle"; rl.legs.forEach(l=>{ const tx=(l.a.x+l.b.x)/2*W, ty=(l.a.y+l.b.y)/2*H, t=(Math.round(l.mi*10)/10).toLocaleString("de-DE")+" mi"; const tw=g.measureText(t).width; g.fillStyle="rgba(15,15,15,.8)"; g.fillRect(tx-tw/2-4*u,ty-9*u,tw+8*u,18*u); g.fillStyle="#ffd24a"; g.fillText(t,tx,ty); }); g.textAlign="left"; }
+    m.marks.forEach(mk=>{
+      const x=mk.x*W, y=mk.y*H, col=mk.c||(mk.t==="text"?MAP_COLORS[2]:MAP_COLORS[0]);
+      if(mk.t==="text"){
+        const fs=([11,14,18][mk.sz==null?1:mk.sz]||14)*u; g.font="500 "+fs+"px system-ui,sans-serif"; const maxW=([200,240,320][mk.sz==null?1:mk.sz]||240)*u;
+        const lines=[]; if(mk.title) lines.push(...mapWrap(g,mk.title,maxW).map(t=>({t,b:1}))); if(mk.note) lines.push(...mapWrap(g,mk.note,maxW).map(t=>({t,b:0})));
+        let w=0; lines.forEach(l=>{ g.font=(l.b?"700 ":"500 ")+fs+"px system-ui,sans-serif"; w=Math.max(w,g.measureText(l.t).width); });
+        const bw=w+16*u, bh=lines.length*fs*1.3+10*u, bx=x-bw/2, by=y-bh/2;
+        g.fillStyle="rgba(255,248,225,.94)"; g.strokeStyle=col; g.lineWidth=2*u; g.beginPath(); g.roundRect?g.roundRect(bx,by,bw,bh,8*u):g.rect(bx,by,bw,bh); g.fill(); g.stroke();
+        g.fillStyle="#2a2113"; g.textBaseline="top"; lines.forEach((l,i)=>{ g.font=(l.b?"700 ":"500 ")+fs+"px system-ui,sans-serif"; g.fillText(l.t,bx+8*u,by+5*u+i*fs*1.3); });
+      }else{
+        const party=mk.t==="party", r=(party?17:14)*u, cy=party?y:y-r-9*u;
+        if(!party){ g.fillStyle=col; g.beginPath(); g.moveTo(x-7*u,cy+r-3*u); g.lineTo(x+7*u,cy+r-3*u); g.lineTo(x,y); g.closePath(); g.fill(); }
+        g.fillStyle=party?"#f1c40f":col; g.beginPath(); g.arc(x,cy,r,0,6.2832); g.fill(); g.strokeStyle=party?"#7a5b00":"#fff"; g.lineWidth=2.5*u; g.stroke();
+        g.fillStyle=party?"#2a2113":"#fff"; g.font=(16*u)+"px system-ui,'Segoe UI Emoji','Apple Color Emoji',sans-serif"; g.textAlign="center"; g.textBaseline="middle"; g.fillText(party?"🧭":(mk.ic||"📍"),x,cy+u); g.textAlign="left";
+        if((party||(MAP_UI.labels&&mk.lab!==false))&&mk.title){ g.font="600 "+(13*u)+"px system-ui,sans-serif"; const tw=g.measureText(mk.title).width; g.fillStyle="rgba(15,15,15,.8)"; g.beginPath(); g.roundRect?g.roundRect(x+r+4*u,cy-10*u,tw+14*u,20*u,6*u):g.rect(x+r+4*u,cy-10*u,tw+14*u,20*u); g.fill(); g.fillStyle="#fff"; g.textBaseline="middle"; g.fillText(mk.title,x+r+11*u,cy+u); }
+      }
+    });
+    { const n=mapNorth(m), r=36*u, cx=20*u+r, cy=20*u+r; g.fillStyle="rgba(20,20,20,.62)"; g.strokeStyle="#e8d9a8"; g.lineWidth=1.5*u; g.beginPath(); g.arc(cx,cy,r,0,6.2832); g.fill(); g.stroke();
+      const a0=n*Math.PI/180, pt=(a,d)=>[cx+d*Math.sin(a),cy-d*Math.cos(a)]; g.fillStyle="#e04a3f"; g.beginPath(); [pt(a0,r*.72),pt(a0+1.5708,r*.17),pt(a0-1.5708,r*.17)].forEach((p,i)=>i?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1])); g.fill();
+      g.fillStyle="#cfcfcf"; g.beginPath(); [pt(a0+3.1416,r*.72),pt(a0+1.5708,r*.17),pt(a0-1.5708,r*.17)].forEach((p,i)=>i?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1])); g.fill();
+      g.textAlign="center"; g.textBaseline="middle"; ["N",LANG==="de"?"O":"E","S","W"].forEach((t,i)=>{ const p=pt(a0+i*1.5708,r*.74); g.font="700 "+((i?12:15)*u)+"px Georgia,serif"; g.fillStyle=i?"#e8d9a8":"#ffb3a8"; g.fillText(t,p[0],p[1]); }); g.textAlign="left"; }
+    cv.toBlob(b=>{ if(b) download("Karte_"+(m.name||"Karte").replace(/[^\w\-]+/g,"_")+".png",b,"image/png"); },"image/png");
+  };
+  im.onerror=()=>toast("⚠ "+T2("Kein Kartenbild vorhanden","No map image available")); im.src=src;
+}
+/* ---- maps: export / import as a file (markers, areas, route, travel marker, optionally the picture) ---- */
+function mapExportDlg(m){
+  let all=MAPS.maps.length>1, withImg=true;
+  const cA=h("input",{type:"checkbox",checked:all,onchange:e=>{ all=e.target.checked; }}), cI=h("input",{type:"checkbox",checked:true,onchange:e=>{ withImg=e.target.checked; }});
+  const go=()=>{ closeModal();
+    const list=all?MAPS.maps:[m], images={};
+    if(withImg) list.forEach(x=>{ const s=mapSrc(x); if(s) images[x.id]=s; });
+    const obj={app:"dnd-map-export",version:1,ts:Date.now(),maps:JSON.parse(JSON.stringify(list)),images};
+    const txt=JSON.stringify(obj); download("dnd-karte-"+(list.length===1?(list[0].name||"karte").replace(/[^\wäöüÄÖÜß-]+/g,"_")+"-":"")+bkDate(obj.ts)+".json",txt);
+    toast("💾 "+T2("Karten-Datei gespeichert","Map file saved")+" ("+bkKB(txt)+")"); };
+  modal(h("div",{},h("h3",{style:"margin-top:0"},"⬇ "+T2("Karte exportieren","Export map")),
+    h("p",{class:"small muted"},T2("Speichert alle Markierungen, bemalten Gebiete, Zeichnungen, Notizen, die Route und den Reisemarker in einer Datei. Mit „Karte importieren“ spielst du sie später wieder ein – z. B. nach einem Update oder auf einem anderen Gerät.","Saves all markers, painted areas, drawings, notes, the route and the travel marker in one file. Restore it later with “Import map” – e.g. after an update or on another device.")),
+    MAPS.maps.length>1?h("label",{style:"display:flex;gap:8px;align-items:center;margin:6px 0"},cA,T2("Alle "+MAPS.maps.length+" Karten (sonst nur „"+(m.name||"")+"“)","All "+MAPS.maps.length+" maps (otherwise only “"+(m.name||"")+"”)")):null,
+    h("label",{style:"display:flex;gap:8px;align-items:center;margin:6px 0"},cI,T2("Kartenbild mit speichern (Datei wird größer)","Include the map picture (makes the file larger)")),
+    h("div",{class:"row",style:"margin-top:12px"},h("span",{class:"space"}),h("button",{class:"btn",onclick:closeModal},T2("Abbrechen","Cancel")),h("button",{class:"btn btn-primary",onclick:go},"⬇ "+T2("Datei speichern","Save file")))),{width:460});
+}
+function mapImportPick(){
+  const inp=h("input",{type:"file",accept:".json,application/json",style:"display:none"});
+  inp.addEventListener("change",()=>{ const f=inp.files&&inp.files[0]; inp.remove(); if(!f) return; const r=new FileReader();
+    r.onload=()=>{ let o=null; try{ o=JSON.parse(r.result); }catch(e){}
+      if(!o||o.app!=="dnd-map-export"||!Array.isArray(o.maps)||!o.maps.length){ toast("⚠ "+T2("Das ist keine Karten-Datei (erwartet: über „Karte exportieren“ gespeichert)","Not a map file (expected: saved via “Export map”)")); return; }
+      mapImportDlg(o); };
+    r.readAsText(f); });
+  inp.addEventListener("cancel",()=>inp.remove()); document.body.appendChild(inp); inp.click();
+}
+function mapImportDlg(o){
+  const imgs=(o.images&&typeof o.images==="object")?o.images:{}, rows=[];
+  const body=h("div",{},h("h3",{style:"margin-top:0"},"⬆ "+T2("Karte importieren","Import map")),
+    h("p",{class:"small muted"},T2("Vor dem Einspielen wird automatisch ein Schnappschuss deiner jetzigen Daten angelegt (Knopf „Backup“), du kannst also zurück.","A snapshot of your current data is taken first (button “Backup”), so you can go back.")));
+  o.maps.forEach(mp=>{
+    const ex=MAPS.maps.find(x=>x.id===mp.id), n=(mp.marks||[]).length, ar=(mp.areas||[]).length;
+    const sel=h("select",{style:"width:auto"},...(ex?[["replace",T2("Ersetzen (Stand aus Datei)","Replace (state from file)")],["copy",T2("Als weitere Karte hinzufügen","Add as another map")],["skip",T2("Überspringen","Skip")]]:[["add",T2("Hinzufügen","Add")],["skip",T2("Überspringen","Skip")]]).map(([v,l])=>h("option",{value:v},l)));
+    rows.push({mp,sel,ex});
+    body.appendChild(h("div",{class:"wizard-step",style:"margin:6px 0"},h("b",{},mp.name||T2("Karte","Map")),
+      h("div",{class:"small muted"},n+" "+T2("Markierungen","markers")+" · "+ar+" "+T2("Gebiete/Zeichnungen","areas/drawings")+" · "+(imgs[mp.id]?T2("mit Bild","with picture"):T2("ohne Bild","no picture"))+(ex?" · "+T2("gibt es schon","already exists"):"")),sel)); });
+  const go=()=>{ closeModal(); bkSnap(T2("vor Karten-Import","before map import")); let last="";
+    rows.forEach(({mp,sel,ex})=>{ const how=sel.value; if(how==="skip") return;
+      const img=imgs[mp.id]||""; let nm=JSON.parse(JSON.stringify(mp));
+      if(how==="replace"){ const i=MAPS.maps.findIndex(x=>x.id===mp.id); MAPS.maps[i]=nm; if(img) MAPIMG[nm.id]=img; last=nm.id; }
+      else if(how==="copy"){ nm.id=uid(); nm.name=(nm.name||"")+" ("+T2("Import","import")+")"; const s=img||mapSrc(ex); if(s){ MAPIMG[nm.id]=s; nm.img="up"; } MAPS.maps.push(nm); last=nm.id; }
+      else{ MAPS.maps.push(nm); if(img){ MAPIMG[nm.id]=img; if(nm.img==="builtin") nm.img="up"; } last=nm.id; }
+      delete MAP_DIM[nm.id]; delete MAP_VIEW[nm.id]; });
+    if(last) MAPS.sel=last; MAP_UI.edit=""; MAP_UI.scalePts=[]; MAP_UI.area="";
+    const okI=saveMapImg(), okM=saveMaps(); toast(okI&&okM?"✅ "+T2("Karte eingespielt","Map imported"):"⚠ "+T2("Nicht alles ließ sich speichern","Not everything could be saved")); render(); };
+  body.appendChild(h("div",{class:"row",style:"margin-top:12px"},h("span",{class:"space"}),h("button",{class:"btn",onclick:closeModal},T2("Abbrechen","Cancel")),h("button",{class:"btn btn-primary",onclick:go},"⬆ "+T2("Einspielen","Import"))));
+  modal(body,{width:520});
+}
+function mapView(){
+  const wrap=h("div",{}), m=mapCur();
+  const head=h("div",{class:"card"}); wrap.appendChild(head);
+  const addMap=()=>mapPickImage((u,n)=>{ const nm={id:uid(),name:n||T2("Neue Karte","New map"),img:"up",marks:[],ts:Date.now(),upd:Date.now()}; MAPIMG[nm.id]=u; if(!saveMapImg()){ delete MAPIMG[nm.id]; return; } MAPS.maps.push(nm); MAPS.sel=nm.id; MAP_UI.edit=""; saveMaps(); render(); });
+  head.appendChild(h("div",{class:"row",style:"gap:8px;flex-wrap:wrap;align-items:center"},h("h2",{style:"margin:0"},"🗺 "+T2("Karten","Maps")),h("span",{class:"space"}),
+    MAPS.maps.length>1?h("select",{style:"width:auto;max-width:260px",title:T2("Karte wählen","Choose a map"),onchange:e=>{ MAPS.sel=e.target.value; MAP_UI.edit=""; MAP_UI.scalePts=[]; saveMaps(); render(); }},...MAPS.maps.map(x=>h("option",{value:x.id,selected:m&&x.id===m.id},x.name||T2("Karte","Map")))):null,
+    h("button",{class:"btn btn-sm",onclick:mapImportPick,title:T2("Eine zuvor exportierte Karten-Datei einspielen (Markierungen, Gebiete, Route …)","Load a previously exported map file (markers, areas, route …)")},"⬆ "+T2("Import","Import")),
+     h("button",{class:"btn btn-primary btn-sm",onclick:addMap,title:T2("Eine weitere Landkarte aus einer Bilddatei anlegen","Create another map from an image file")},"＋ "+T2("Karte hinzufügen","Add map"))));
+  if(!m){ head.appendChild(h("p",{class:"muted"},T2("Noch keine Karte – mit „＋ Karte hinzufügen“ ein Bild laden.","No map yet – load an image with “＋ Add map”."))); return wrap; }
+  MAPS.sel=m.id; if(!Array.isArray(m.marks)) m.marks=[]; if(!Array.isArray(m.route)) m.route=[]; if(!Array.isArray(m.trail)) m.trail=[]; if(!Array.isArray(m.areas)) m.areas=[];
+  const idx={}; const reidx=()=>{ for(const k in idx) delete idx[k]; m.marks.forEach(x=>{ idx[x.id]=x; }); m.areas.forEach(a=>{ if(a.lab) idx[a.lab.id]=a.lab; }); };
+  head.appendChild(h("div",{class:"row",style:"gap:6px;flex-wrap:wrap;align-items:center;margin-top:8px"},
+    h("b",{},m.name||T2("Karte","Map")),
+    h("button",{class:"btn btn-sm",title:T2("Karte umbenennen","Rename the map"),onclick:()=>askText(T2("Name der Karte:","Name of the map:"),m.name,v=>{ m.name=(v||"").trim()||m.name; saveMaps(); render(); })},"✎"),
+    h("button",{class:"btn btn-sm",title:T2("Anderes Kartenbild laden (die Markierungen bleiben)","Load another image (the markers stay)"),onclick:()=>mapPickImage(u=>{ MAPIMG[m.id]=u; if(saveMapImg()){ delete MAP_DIM[m.id]; delete MAP_VIEW[m.id]; render(); } })},"🖼 "+T2("Bild ersetzen","Replace image")),
+    h("span",{class:"space"}),
+    h("button",{class:"btn btn-sm",title:T2("Alle Änderungen an der Karte als Datei sichern (Export) – zum Wiedereinspielen nach Updates oder auf anderen Geräten","Save all changes to the map as a file (export) – to restore after updates or on other devices"),onclick:()=>mapExportDlg(m)},"⬇ "+T2("Export","Export")),
+     h("button",{class:"btn btn-sm",title:T2("Karte mit allen Markierungen als PNG-Bild speichern","Save the map with all markers as a PNG image"),onclick:()=>mapExportPng(m)},"🖼 PNG"),
+    h("button",{class:"btn btn-sm btn-danger",title:T2("Diese Karte mit allen Markierungen löschen","Delete this map with all its markers"),onclick:()=>askYes(T2("Die Karte „"+(m.name||"")+"“ mit allen Markierungen löschen?","Delete the map “"+(m.name||"")+"” with all its markers?"),()=>{ MAPS.maps=MAPS.maps.filter(x=>x.id!==m.id); delete MAPIMG[m.id]; saveMapImg(); MAPS.sel=""; MAP_UI.edit=""; saveMaps(); render(); })},"🗑")));
+  const v=MAP_VIEW[m.id]||(MAP_VIEW[m.id]={s:1,tx:0,ty:0,auto:true});
+  const src=mapSrc(m), dim=MAP_DIM[m.id]||{w:1000,h:1300}; let W=dim.w, H=dim.h;
+  const box=h("div",{class:"map-box mode-"+MAP_UI.mode}), stage=h("div",{class:"map-stage"}), marksEl=h("div",{class:"map-marks"}), edit=h("div",{class:"map-edit"});
+  const svg=document.createElementNS("http://www.w3.org/2000/svg","svg"); svg.setAttribute("class","map-svg");
+  const hint=h("div",{class:"map-hint"}), zlab=h("span",{class:"map-zlab"},"100 %");
+  const fitS=()=>Math.max(0.01,Math.min((box.clientWidth||600)/W,(box.clientHeight||500)/H));
+  const clampV=()=>{ const bw=box.clientWidth,bh=box.clientHeight,k=60; v.tx=Math.min(bw-k,Math.max(k-W*v.s,v.tx)); v.ty=Math.min(bh-k,Math.max(k-H*v.s,v.ty)); };
+  const sp=p=>[v.tx+p.x*W*v.s, v.ty+p.y*H*v.s];
+  const mi=(a,b)=>Math.hypot((a.x-b.x)*W,(a.y-b.y)*H)/W*mapMpw(m);
+  const fmt=x=>(Math.round(x*10)/10).toLocaleString(LANG==="de"?"de-DE":"en-GB")+" mi";
+  const drawOverlay=()=>{
+    let s=""; const party=m.marks.find(x=>x.t==="party");
+    if(m.trail.length){ const tp=m.trail.concat(party?[party]:[]).map(sp); s+='<polyline points="'+tp.map(p=>p[0].toFixed(1)+","+p[1].toFixed(1)).join(" ")+'" fill="none" stroke="#f1c40f" stroke-width="3" stroke-dasharray="2 7" stroke-linecap="round"/>'; m.trail.forEach(p=>{ const q=sp(p); s+='<circle cx="'+q[0].toFixed(1)+'" cy="'+q[1].toFixed(1)+'" r="3" fill="#f1c40f"/>'; }); }
+    const rl=mapRouteLegs(m,W,H);
+    if(rl.pts.length>0){ const q=rl.pts.map(sp);
+      if(q.length>1){ const pl=q.map(p=>p[0].toFixed(1)+","+p[1].toFixed(1)).join(" "); s+='<polyline points="'+pl+'" fill="none" stroke="rgba(0,0,0,.7)" stroke-width="7" stroke-linejoin="round" stroke-linecap="round"/><polyline points="'+pl+'" fill="none" stroke="#ffd24a" stroke-width="3.5" stroke-dasharray="9 6" stroke-linejoin="round"/>'; }
+      rl.legs.forEach((l,i)=>{ const a=q[i], b=q[i+1], t=fmt(l.mi), w=t.length*6.6+10; s+='<g transform="translate('+((a[0]+b[0])/2).toFixed(1)+' '+((a[1]+b[1])/2).toFixed(1)+')"><rect x="'+(-w/2)+'" y="-10" width="'+w+'" height="20" rx="5" fill="rgba(15,15,15,.82)"/><text x="0" y="4.5" text-anchor="middle" font-size="12" font-weight="700" fill="#ffd24a" font-family="system-ui,sans-serif">'+t+'</text></g>'; });
+      q.forEach((p,i)=>{ if(i===0&&rl.pts.length>(m.route||[]).length) return; s+='<circle cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="8" fill="#ffd24a" stroke="#222" stroke-width="2"/><text x="'+p[0].toFixed(1)+'" y="'+(p[1]+4).toFixed(1)+'" text-anchor="middle" font-size="11" font-weight="700" fill="#222" font-family="system-ui,sans-serif">'+(i+1-(rl.pts.length-(m.route||[]).length))+'</text>'; }); }
+    MAP_UI.scalePts.forEach((p,i)=>{ const q=sp(p); s+='<circle cx="'+q[0].toFixed(1)+'" cy="'+q[1].toFixed(1)+'" r="7" fill="#e84393" stroke="#fff" stroke-width="2"/>'; if(i===1){ const a=sp(MAP_UI.scalePts[0]); s+='<line x1="'+a[0].toFixed(1)+'" y1="'+a[1].toFixed(1)+'" x2="'+q[0].toFixed(1)+'" y2="'+q[1].toFixed(1)+'" stroke="#e84393" stroke-width="3" stroke-dasharray="6 4"/>'; } });
+    svg.innerHTML=s;
+  };
+  const layout=()=>{
+    stage.style.width=W+"px"; stage.style.height=H+"px"; stage.style.transform="translate("+v.tx+"px,"+v.ty+"px) scale("+v.s+")";
+    marksEl.querySelectorAll(".map-mark").forEach(el=>{ const mk=idx[el.dataset.id]; if(mk){ el.style.left=(v.tx+mk.x*W*v.s)+"px"; el.style.top=(v.ty+mk.y*H*v.s)+"px"; } });
+    zlab.textContent=Math.round(v.s/fitS()*100)+" %"; marksEl.classList.toggle("lo",v.s/fitS()<1.6);
+    marksEl.querySelectorAll(".map-mark.alab:not(.pen)").forEach(el=>{ const mk=idx[el.dataset.id], a=mk&&m.areas.find(x=>x.id===mk.aid), bb=a&&mapAreaBB(a); if(!bb){ el.style.fontSize="15px"; el.style.display=""; return; } const fs=mapAreaFs(a,(bb.x1-bb.x0)*W*v.s,(bb.y1-bb.y0)*H*v.s,120); el.style.fontSize=fs.toFixed(1)+"px"; el.style.display=(fs<9&&MAP_UI.edit!=="area:"+a.id)?"none":""; });
+    drawOverlay();
+  };
+  const fit=()=>{ const bw=box.clientWidth,bh=box.clientHeight,s=fitS(); v.s=s; v.tx=(bw-W*s)/2; v.ty=(bh-H*s)/2; v.auto=true; layout(); };
+  const zoomAt=(f,cx,cy)=>{ const fs=fitS(), ns=Math.max(fs*0.9,Math.min(fs*12,v.s*f)), r=ns/v.s; v.tx=cx-(cx-v.tx)*r; v.ty=cy-(cy-v.ty)*r; v.s=ns; v.auto=false; clampV(); layout(); };
+  const centerOn=(mk,minZoom)=>{ const bw=box.clientWidth,bh=box.clientHeight; v.s=Math.max(v.s,fitS()*minZoom); v.tx=bw/2-mk.x*W*v.s; v.ty=bh/2-mk.y*H*v.s; v.auto=false; clampV(); layout(); };
+  const markEl=mk=>{
+    const sel=MAP_UI.edit===mk.id;
+    if(mk.t==="arealab"){ const ar=m.areas.find(x=>x.id===mk.aid); if(!ar) return h("span"); if((mk.hide||!ar.name)&&MAP_UI.edit!=="area:"+ar.id) return h("span",{"data-id":mk.id,style:"display:none"}); return h("div",{class:"map-mark alab"+(ar.kind==="pen"?" pen":"")+(MAP_UI.edit==="area:"+ar.id?" sel":""),"data-id":mk.id,title:(ar.name||"")+(ar.note?"\n"+ar.note:""),style:"--c:"+ar.c},ar.name||"…"); }
+    if(mk.t==="text"){ const e=h("div",{class:"map-mark txt sz"+(mk.sz==null?1:mk.sz)+(sel?" sel":""),"data-id":mk.id,style:"--c:"+(mk.c||MAP_COLORS[2])},mk.title?h("b",{},mk.title):null,mk.note?h("div",{class:"map-note"},mk.note):null); if(!mk.title&&!mk.note) e.appendChild(h("i",{},"…")); return e; }
+    if(mk.t==="party"){ const e=h("div",{class:"map-mark party"+(sel?" sel":""),"data-id":mk.id,title:(mk.title||"")+(mk.note?"\n"+mk.note:"")},h("span",{class:"map-party"},"🧭")); if(mk.title) e.appendChild(h("span",{class:"map-lab party-lab"},mk.title)); return e; }
+    const e=h("div",{class:"map-mark pin"+(sel?" sel":""),"data-id":mk.id,title:(mk.title||"")+(mk.note?"\n"+mk.note:""),style:"--c:"+(mk.c||MAP_COLORS[0])},h("span",{class:"map-pin"},mk.ic||"📍"));
+    if(MAP_UI.labels&&mk.lab!==false&&mk.title) e.appendChild(h("span",{class:"map-lab"},mk.title)); return e;
+  };
+  const buildMarks=()=>{ reidx(); marksEl.textContent=""; m.areas.forEach(a=>{ if(a.lab) marksEl.appendChild(markEl(a.lab)); }); m.marks.forEach(mk=>marksEl.appendChild(markEl(mk))); layout(); };
+  const touch=()=>{ m.upd=Date.now(); mapSaveSoon(); };
+  const closeEdit=()=>{ MAP_UI.edit=""; buildMarks(); buildEdit(); };
+  const openEdit=id=>{ MAP_UI.edit=id; buildMarks(); buildEdit(); };
+  function buildEdit(){
+    edit.textContent=""; if(String(MAP_UI.edit).indexOf("area:")===0){ const aa=m.areas.find(x=>x.id===MAP_UI.edit.slice(5)); if(aa){ buildAreaEdit(aa); return; } MAP_UI.edit=""; } const mk=idx[MAP_UI.edit]; edit.style.display=mk?"block":"none"; if(!mk) return;
+    const isT=mk.t==="text", isP=mk.t==="party", ch=()=>{ touch(); buildMarks(); renderList(); };
+    const title=h("input",{type:"text",value:mk.title||"",placeholder:isT?T2("Überschrift (optional)","Heading (optional)"):isP?T2("Wir sind hier","We are here"):T2("Name des Ortes","Name of the place"),style:"width:100%",oninput:e=>{ mk.title=e.target.value; ch(); }});
+    const note=h("textarea",{rows:isT?5:3,placeholder:isT?T2("Hinweistext …","Note text …"):isP?T2("z. B. Tag 3, abends – Lager am Fluss","e.g. day 3, evening – camp by the river"):T2("Notiz zum Ort (optional) …","Note about the place (optional) …"),style:"width:100%;min-height:70px",oninput:e=>{ mk.note=e.target.value; ch(); }}); note.value=mk.note||"";
+    edit.appendChild(h("div",{class:"row",style:"gap:6px;align-items:center;margin-bottom:6px"},h("b",{},isT?"📝 "+T2("Hinweistext","Note"):isP?"🧭 "+T2("Gruppe","Party"):"📍 "+T2("Marker","Marker")),h("span",{class:"space"}),h("button",{class:"btn btn-sm",title:T2("Schließen","Close"),onclick:closeEdit},"✓ "+T2("Fertig","Done"))));
+    edit.appendChild(title); edit.appendChild(h("div",{style:"height:6px"})); edit.appendChild(note);
+    if(!isT&&!isP){
+      const icw=h("div",{class:"map-icons"}); MAP_ICONS.forEach(ic=>icw.appendChild(h("button",{class:"map-ic"+((mk.ic||"📍")===ic?" on":""),onclick:()=>{ mk.ic=ic; touch(); buildMarks(); buildEdit(); }},ic)));
+      edit.appendChild(h("div",{class:"small muted",style:"margin:8px 0 3px"},T2("Symbol","Symbol"))); edit.appendChild(icw);
+      edit.appendChild(h("label",{class:"small",style:"display:flex;gap:6px;align-items:center;margin-top:6px"},h("input",{type:"checkbox",checked:mk.lab!==false,onchange:e=>{ mk.lab=e.target.checked; touch(); buildMarks(); }}),T2("Name neben dem Marker anzeigen","Show the name next to the marker")));
+    }else if(isT){
+      edit.appendChild(h("div",{class:"small muted",style:"margin:8px 0 3px"},T2("Schriftgröße","Text size")));
+      edit.appendChild(h("div",{class:"row",style:"gap:4px"},...[[0,"S"],[1,"M"],[2,"L"]].map(([i,l])=>h("button",{class:"btn btn-sm"+((mk.sz==null?1:mk.sz)===i?" btn-primary":""),onclick:()=>{ mk.sz=i; touch(); buildMarks(); buildEdit(); }},l))));
+    }
+    if(!isP){ const cw=h("div",{class:"row",style:"gap:5px;flex-wrap:wrap"}); MAP_COLORS.forEach(c=>cw.appendChild(h("button",{class:"map-swatch"+((mk.c||(isT?MAP_COLORS[2]:MAP_COLORS[0]))===c?" on":""),style:"background:"+c,title:c,onclick:()=>{ mk.c=c; touch(); buildMarks(); buildEdit(); }})));
+      edit.appendChild(h("div",{class:"small muted",style:"margin:8px 0 3px"},T2("Farbe","Colour"))); edit.appendChild(cw); }
+    const party=m.marks.find(x=>x.t==="party");
+    edit.appendChild(h("div",{class:"row",style:"margin-top:10px;gap:6px;flex-wrap:wrap"},
+      !isP?h("button",{class:"btn btn-sm",title:T2("Zwischen Marker und Hinweistext umschalten","Switch between marker and note"),onclick:()=>{ mk.t=isT?"pin":"text"; if(!isT){ mk.c=mk.c||MAP_COLORS[2]; } touch(); buildMarks(); buildEdit(); }},isT?"→ 📍":"→ 📝"):null,
+      !isP?h("button",{class:"btn btn-sm",title:T2("Route vom Gruppenstandort (falls gesetzt) zu diesem Ort legen und die Reisezeit berechnen","Lay a route from the party's position (if set) to this place and calculate the travel time"),onclick:()=>{ m.route=[{x:mk.x,y:mk.y,t:"road"}]; touch(); closeEdit(); layout(); renderTravel(); toast("📏 "+T2("Route gelegt – Wegpunkte mit „📏 Lineal“ ergänzen","Route set – add waypoints with “📏 Ruler”")); }},"📏 "+T2("Route hierhin","Route here")):null,
+      !isP&&party&&party.id!==mk.id?h("button",{class:"btn btn-sm",title:T2("Die Gruppe hierher versetzen","Move the party here"),onclick:()=>{ setParty(mk.x,mk.y); }},"🧭 "+T2("Gruppe hierher","Party here")):null,
+      h("span",{class:"space"}),
+      h("button",{class:"btn btn-sm btn-danger",onclick:()=>askYes(T2("Diese Markierung löschen?","Delete this marker?"),()=>{ m.marks=m.marks.filter(x=>x.id!==mk.id); MAP_UI.edit=""; touch(); saveMaps(); buildEdit(); buildMarks(); renderList(); renderTravel(); })},"🗑 "+T2("Löschen","Delete"))));
+    setTimeout(()=>{ if(!mk.title&&!mk.note) title.focus(); },30);
+  }
+  edit.addEventListener("pointerdown",e=>e.stopPropagation()); edit.addEventListener("wheel",e=>e.stopPropagation());
+  /* ---- painted areas ---- */
+  const areaCv=h("canvas",{class:"map-areas"}), areaTmp={}; let live=null, rafP=0;
+  const paintBar=h("div",{class:"map-paintbar"});
+  const areaById=id=>m.areas.find(a=>a.id===id)||null;
+  const curArea=()=>areaById(MAP_UI.area);
+  function drawAreas(){ const g=areaCv.getContext("2d"); g.clearRect(0,0,areaCv.width,areaCv.height); mapAreasTo(g,areaCv.width,areaCv.height,m.areas,areaTmp,live); }
+  function sizeAreas(){ const ca=Math.min(1,1400/Math.max(W,H)); areaCv.width=Math.max(1,Math.round(W*ca)); areaCv.height=Math.max(1,Math.round(H*ca)); areaCv.style.width=W+"px"; areaCv.style.height=H+"px"; for(const k in areaTmp) delete areaTmp[k]; drawAreas(); }
+  const scheduleDraw=()=>{ if(!rafP) rafP=requestAnimationFrame(()=>{ rafP=0; drawAreas(); }); };
+  function labelAuto(a){ if(a.lab.auto===false||!a.strokes.length) return; let x0=2,y0=2,x1=-1,y1=-1; a.strokes.forEach(st=>st.p.forEach(q=>{ x0=Math.min(x0,q[0]); x1=Math.max(x1,q[0]); y0=Math.min(y0,q[1]); y1=Math.max(y1,q[1]); })); a.lab.x=(x0+x1)/2; a.lab.y=(y0+y1)/2; }
+  function newArea(kind,then){ const pen=kind==="pen"; askText(pen?T2("Name oder Bedeutung der Zeichnung (z. B. Schrein, Gefahr – darf auch leer bleiben):","Name or meaning of the drawing (e.g. shrine, danger – may stay empty):"):T2("Name des neuen Gebiets:","Name of the new area:"),"",nm=>{ nm=(nm||"").trim(); if(!nm&&!pen) return; const id=uid(), a={id,name:nm,note:"",kind:pen?"pen":"marker",c:pen?MAP_COLORS[8]:MAP_COLORS[m.areas.filter(x=>x.kind!=="pen").length%7],al:pen?1:0.38,strokes:[],lab:{id:"lab_"+id,t:"arealab",aid:id,x:0.5,y:0.5,auto:true}}; m.areas.push(a); MAP_UI.area=id; MAP_UI.bs=pen?1:4; touch(); buildPaintBar(); buildMarks(); renderList(); if(then) then(a); }); }
+  function areaAt(lx,ly){ const q=norm(lx,ly); for(let i=m.areas.length-1;i>=0;i--){ const a=m.areas[i], ent=areaTmp[a.id]; if(!ent) continue; const g=ent.cv.getContext("2d"), cx=Math.floor(q.x*ent.cv.width), cy=Math.floor(q.y*ent.cv.height), r=Math.max(1,Math.round(12/v.s*ent.cv.width/W)), x0=Math.max(0,cx-r), y0=Math.max(0,cy-r), x1=Math.min(ent.cv.width-1,cx+r), y1=Math.min(ent.cv.height-1,cy+r); if(x1<x0||y1<y0) continue; const d=g.getImageData(x0,y0,x1-x0+1,y1-y0+1).data; for(let k=3;k<d.length;k+=4){ if(d[k]>40) return a; } } return null; }
+  function eraseAt(a,q){ const R=MAP_BRUSH[MAP_UI.bs]*0.6+0.004, n=a.strokes.length; a.strokes=a.strokes.filter(st=>!st.p.some(pt=>Math.hypot((pt[0]-q.x)*W,(pt[1]-q.y)*H)/W<R+st.w/2)); if(a.strokes.length!==n){ labelAuto(a); if(live) live.changed=true; scheduleDraw(); } }
+  function startPaint(p,pid){
+    const a=curArea(); if(!a){ newArea("marker"); return; } const q=norm(p[0],p[1]);
+    if(MAP_UI.tool==="erase"){ live={a,s:null,erase:true}; drag={kind:"paint",pid}; eraseAt(a,q); return; }
+    live={a,s:{w:MAP_BRUSH[MAP_UI.bs],p:[[Math.round(q.x*10000)/10000,Math.round(q.y*10000)/10000]]}}; drag={kind:"paint",pid}; scheduleDraw();
+  }
+  function paintMove(p){ if(!live) return; const q=norm(p[0],p[1]); if(live.erase){ eraseAt(live.a,q); return; } const last=live.s.p[live.s.p.length-1]; if(Math.hypot((q.x-last[0])*W,(q.y-last[1])*H)/W<0.0015) return; live.s.p.push([Math.round(q.x*10000)/10000,Math.round(q.y*10000)/10000]); scheduleDraw(); }
+  function paintEnd(){ if(!live) return; const l=live; live=null; if(l.erase){ if(l.changed){ drawAreas(); touch(); buildMarks(); renderList(); } return; } if(l.s&&l.s.p.length){ l.a.strokes.push(l.s); labelAuto(l.a); touch(); buildMarks(); renderList(); } drawAreas(); }
+  function cancelPaint(){ if(live){ live=null; drawAreas(); } }
+  function buildPaintBar(){
+    paintBar.textContent=""; const a=curArea();
+    paintBar.appendChild(h("select",{style:"width:auto;max-width:200px",title:T2("In welchem Gebiet du malst","Which area you are painting"),onchange:e=>{ MAP_UI.area=e.target.value; buildPaintBar(); }},h("option",{value:""},T2("— Gebiet wählen —","— choose an area —")),...m.areas.map(x=>h("option",{value:x.id,selected:x.id===MAP_UI.area},x.name||"…"))));
+    paintBar.appendChild(h("button",{class:"btn btn-sm btn-primary",title:T2("Breiter, durchscheinender Marker für Gebiete","Wide, translucent marker for areas"),onclick:()=>newArea("marker")},"＋ 🖌 "+T2("Gebiet","Area")));
+    paintBar.appendChild(h("button",{class:"btn btn-sm btn-primary",title:T2("Deckender Stift für eigene Symbole und Zeichnungen","Opaque pen for your own symbols and drawings"),onclick:()=>newArea("pen")},"＋ ✏ "+T2("Zeichnung","Drawing")));
+    const cw=h("span",{class:"row",style:"gap:4px;flex-wrap:wrap"}); MAP_COLORS.forEach(c=>cw.appendChild(h("button",{class:"map-swatch"+(a&&a.c===c?" on":""),style:"background:"+c,title:T2("Farbe des Gebiets","Colour of the area"),onclick:()=>{ if(!a){ toast(T2("Erst ein Gebiet wählen oder anlegen","Choose or create an area first")); return; } a.c=c; touch(); drawAreas(); buildMarks(); buildPaintBar(); renderList(); }}))); paintBar.appendChild(cw);
+    [["·",0],["S",1],["M",2],["L",3],["XL",4],["XXL",5]].forEach(([l,i])=>paintBar.appendChild(h("button",{class:"btn btn-sm"+(MAP_UI.bs===i?" btn-primary":""),title:T2("Strichstärke","Line width"),onclick:()=>{ MAP_UI.bs=i; buildPaintBar(); }},l)));
+    paintBar.appendChild(h("button",{class:"btn btn-sm"+(MAP_UI.tool==="paint"?" btn-primary":""),onclick:()=>{ MAP_UI.tool="paint"; buildPaintBar(); }},"✏ "+T2("Malen","Paint")));
+    paintBar.appendChild(h("button",{class:"btn btn-sm"+(MAP_UI.tool==="erase"?" btn-primary":""),title:T2("Streicht ganze Striche des gewählten Gebiets / der gewählten Zeichnung weg","Removes whole strokes of the chosen area / drawing"),onclick:()=>{ MAP_UI.tool="erase"; buildPaintBar(); }},"🧽 "+T2("Radieren","Erase")));
+    paintBar.appendChild(h("button",{class:"btn btn-sm",disabled:!a||!a.strokes.length,title:T2("Letzten Pinselstrich zurücknehmen","Undo the last brush stroke"),onclick:()=>{ if(a&&a.strokes.length){ a.strokes.pop(); labelAuto(a); touch(); drawAreas(); buildMarks(); buildPaintBar(); renderList(); } }},"↶"));
+    paintBar.appendChild(h("button",{class:"btn btn-sm",onclick:()=>setMode("move")},"✓ "+T2("Fertig","Done")));
+  }
+  function buildAreaEdit(a){
+    edit.style.display="block"; const ch=()=>{ touch(); buildMarks(); renderList(); };
+    edit.appendChild(h("div",{class:"row",style:"gap:6px;align-items:center;margin-bottom:6px"},h("b",{},(a.kind==="pen"?"✏ "+T2("Zeichnung","Drawing"):"🖌 "+T2("Gebiet","Area"))),h("span",{class:"space"}),h("button",{class:"btn btn-sm",onclick:closeEdit},"✓ "+T2("Fertig","Done"))));
+    edit.appendChild(h("input",{type:"text",value:a.name||"",placeholder:T2("Name (z. B. Winterwald, Schrein)","Name (e.g. Winter Forest, shrine)"),style:"width:100%",oninput:e=>{ a.name=e.target.value; ch(); }}));
+    const nt=h("textarea",{rows:3,placeholder:T2("Bedeutung / Notiz (z. B. Hier warten Untote)","Meaning / note (e.g. undead lurk here)"),style:"width:100%;min-height:60px;margin-top:6px",oninput:e=>{ a.note=e.target.value; touch(); renderList(); buildMarks(); }}); nt.value=a.note||""; edit.appendChild(nt);
+    edit.appendChild(h("label",{class:"small",style:"display:flex;gap:6px;align-items:center;margin-top:6px"},h("input",{type:"checkbox",checked:!a.lab.hide,onchange:e=>{ a.lab.hide=!e.target.checked; touch(); buildMarks(); }}),T2("Namensschild auf der Karte zeigen","Show the name tag on the map")));
+    const cw=h("div",{class:"row",style:"gap:5px;flex-wrap:wrap"}); MAP_COLORS.forEach(c=>cw.appendChild(h("button",{class:"map-swatch"+(a.c===c?" on":""),style:"background:"+c,onclick:()=>{ a.c=c; touch(); drawAreas(); buildMarks(); buildAreaEdit2(a); renderList(); }})));
+    edit.appendChild(h("div",{class:"small muted",style:"margin:8px 0 3px"},T2("Farbe","Colour"))); edit.appendChild(cw);
+    edit.appendChild(h("div",{class:"small muted",style:"margin:8px 0 3px"},T2("Deckkraft","Opacity")));
+    edit.appendChild(h("div",{class:"row",style:"gap:4px"},...[[0.22,T2("leicht","light")],[0.38,T2("mittel","medium")],[0.58,T2("kräftig","strong")],[1,T2("deckend","opaque")]].map(([v2,l])=>h("button",{class:"btn btn-sm"+(Math.abs((a.al==null?0.38:a.al)-v2)<0.01?" btn-primary":""),onclick:()=>{ a.al=v2; touch(); drawAreas(); buildAreaEdit2(a); }},l))));
+    edit.appendChild(h("div",{class:"row",style:"margin-top:10px;gap:6px;flex-wrap:wrap"},
+      h("button",{class:"btn btn-sm",title:T2("Mit dem Pinsel weitermalen","Keep painting with the brush"),onclick:()=>{ MAP_UI.area=a.id; MAP_UI.tool="paint"; closeEdit(); setMode("paint"); }},"🖌 "+T2("Weitermalen","Keep painting")),
+      h("button",{class:"btn btn-sm",title:T2("Das Namensschild wieder in die Mitte des Gebiets setzen","Put the name tag back into the middle of the area"),onclick:()=>{ a.lab.auto=true; labelAuto(a); touch(); buildMarks(); }},"⌖ "+T2("Name zentrieren","Centre name")),
+      h("span",{class:"space"}),
+      h("button",{class:"btn btn-sm btn-danger",onclick:()=>askYes(T2("Das Gebiet „"+(a.name||"")+"“ löschen?","Delete the area “"+(a.name||"")+"”?"),()=>{ m.areas=m.areas.filter(x=>x.id!==a.id); delete areaTmp[a.id]; if(MAP_UI.area===a.id) MAP_UI.area=""; MAP_UI.edit=""; touch(); saveMaps(); drawAreas(); buildMarks(); buildEdit(); renderList(); })},"🗑 "+T2("Löschen","Delete"))));
+  }
+  function buildAreaEdit2(a){ edit.textContent=""; buildAreaEdit(a); }
+  function setParty(x,y){
+    const old=m.marks.find(p=>p.t==="party"); if(old){ if(Math.hypot((old.x-x)*W,(old.y-y)*H)>2) m.trail.push({x:old.x,y:old.y}); if(m.trail.length>200) m.trail.shift(); m.marks=m.marks.filter(p=>p!==old); }
+    const nm={id:"party",t:"party",x:clamp(x,0,1),y:clamp(y,0,1),title:T2("Wir sind hier","We are here"),note:old&&old.note?old.note:""}; m.marks.push(nm); m.upd=Date.now(); saveMaps(); openEdit("party"); renderList(); renderTravel();
+  }
+  /* tool bar */
+  const bar=h("div",{class:"ink-bar",style:"margin-top:8px"}); const modeBtns={};
+  const HINTS={paint:"🖌 "+T2("Mit Finger oder Stift malen (zwei Finger = zoomen und verschieben)","Paint with a finger or pen (two fingers = zoom and move)"),pin:"📍 "+T2("Tippe auf die Karte, um den Marker zu setzen","Tap the map to place the marker"),text:"📝 "+T2("Tippe auf die Karte, um den Hinweistext zu setzen","Tap the map to place the note"),party:"🧭 "+T2("Tippe dorthin, wo ihr gerade seid","Tap where the party is now"),ruler:"📏 "+T2("Tippe nacheinander die Wegpunkte an (Weg zum Ziel)","Tap the waypoints one after another (the way to the goal)"),scale:"📐 "+T2("Tippe zwei Punkte an, deren Abstand du in Meilen kennst","Tap two points whose distance in miles you know")};
+  const setMode=md=>{ MAP_UI.mode=md; box.className="map-box mode-"+md; Object.keys(modeBtns).forEach(k=>modeBtns[k].classList.toggle("btn-primary",k===md)); hint.style.display=md==="move"?"none":"block"; paintBar.style.display=md==="paint"?"flex":"none"; if(md==="paint") buildPaintBar(); hint.textContent=HINTS[md]||""; if(md!=="scale"&&MAP_UI.scalePts.length){ MAP_UI.scalePts=[]; layout(); } };
+  [["move","✋ "+T2("Verschieben","Move"),T2("Karte verschieben und zoomen; Markierungen antippen oder verschieben","Move and zoom the map; tap or drag markers")],["pin","📍 "+T2("Marker","Marker"),T2("Marker setzen – danach auf die Karte tippen","Add a marker – then tap the map")],["text","📝 "+T2("Hinweistext","Note"),T2("Hinweistext setzen – danach auf die Karte tippen","Add a note – then tap the map")],["paint","✏ "+T2("Malen","Paint"),T2("Gebiete wie mit einem Marker bemalen und eigene Symbole zeichnen – alles lässt sich benennen","Paint areas like with a marker and draw your own symbols – everything can be named")],["party","🧭 "+T2("Gruppe hier","Party here"),T2("Reisemarker: wo ist die Gruppe gerade?","Travel marker: where is the party now?")],["ruler","📏 "+T2("Lineal","Ruler"),T2("Strecke und Reisezeit messen","Measure distance and travel time")],["scale","📐 "+T2("Maßstab","Scale"),T2("Maßstab eichen: zwei Punkte mit bekanntem Abstand antippen","Calibrate the scale: tap two points with a known distance")]].forEach(([k,l,t])=>{ modeBtns[k]=h("button",{class:"btn btn-sm"+(MAP_UI.mode===k?" btn-primary":""),title:t,onclick:()=>setMode(MAP_UI.mode===k&&k!=="move"?"move":k)},l); bar.appendChild(modeBtns[k]); });
+  bar.appendChild(h("span",{class:"space"}));
+  const togL=h("button",{class:"btn btn-sm"+(MAP_UI.labels?" btn-primary":""),title:T2("Namen neben den Markern ein-/ausblenden","Show / hide the names next to the markers"),onclick:()=>{ MAP_UI.labels=!MAP_UI.labels; togL.classList.toggle("btn-primary",MAP_UI.labels); buildMarks(); }},"🏷 "+T2("Namen","Names"));
+  const togK=h("button",{class:"btn btn-sm"+(MAP_UI.lock?" btn-primary":""),title:T2("Markierungen fixieren, damit sie nicht aus Versehen verschoben werden","Lock the markers so that they are not moved by accident"),onclick:()=>{ MAP_UI.lock=!MAP_UI.lock; togK.classList.toggle("btn-primary",MAP_UI.lock); togK.textContent=(MAP_UI.lock?"🔒 ":"🔓 ")+T2("Fixieren","Lock"); }},(MAP_UI.lock?"🔒 ":"🔓 ")+T2("Fixieren","Lock"));
+  bar.appendChild(togL); bar.appendChild(togK); head.appendChild(bar); head.appendChild(paintBar);
+  /* map box */
+  const img=h("img",{class:"map-img",alt:m.name||"",draggable:"false"});
+  stage.appendChild(img); stage.appendChild(areaCv); box.appendChild(stage); box.appendChild(svg); box.appendChild(marksEl); box.appendChild(hint); box.appendChild(edit);
+  const zc=h("div",{class:"map-zoomctl"},h("button",{class:"btn btn-sm",title:T2("Verkleinern","Zoom out"),onclick:()=>zoomAt(1/1.5,box.clientWidth/2,box.clientHeight/2)},"−"),zlab,h("button",{class:"btn btn-sm",title:T2("Hineinzoomen","Zoom in"),onclick:()=>zoomAt(1.5,box.clientWidth/2,box.clientHeight/2)},"+"),h("button",{class:"btn btn-sm",title:T2("Ganze Karte anzeigen","Show the whole map"),onclick:fit},"⤢"),
+    h("button",{class:"btn btn-sm",title:T2("Zur Gruppe springen","Jump to the party"),onclick:()=>{ const p=m.marks.find(x=>x.t==="party"); if(p) centerOn(p,3); else toast("🧭 "+T2("Noch kein Gruppen-Marker gesetzt","No party marker set yet")); }},"🧭"));
+  zc.addEventListener("pointerdown",e=>e.stopPropagation()); box.appendChild(zc);
+  /* compass overlay: the north of the world does not have to be the top of the picture (here: top = east, north = left) */
+  const compass=h("div",{class:"map-compass",title:T2("Kompass: Norden liegt auf dieser Karte in Pfeilrichtung. Antippen = um 90° drehen","Compass: north is in the arrow's direction on this map. Tap = turn by 90°")});
+  const drawCompass=()=>{ const n=mapNorth(m); let s='<svg viewBox="0 0 64 64" width="64" height="64"><circle cx="32" cy="32" r="30" fill="rgba(20,20,20,.62)" stroke="#e8d9a8" stroke-width="1.5"/><g transform="rotate('+n+' 32 32)"><polygon points="32,9 37.5,32 26.5,32" fill="#e04a3f"/><polygon points="32,55 37.5,32 26.5,32" fill="#cfcfcf"/></g><circle cx="32" cy="32" r="3" fill="#e8d9a8"/>';
+    ["N","O","S","W"].forEach((t,i)=>{ const a=(n+i*90)*Math.PI/180, r=i===0?23:22; s+='<text x="'+(32+r*Math.sin(a)).toFixed(1)+'" y="'+(32-r*Math.cos(a)+4).toFixed(1)+'" text-anchor="middle" font-size="'+(i===0?13:10)+'" font-weight="700" font-family="Georgia,serif" fill="'+(i===0?"#ffb3a8":"#e8d9a8")+'">'+(i===1&&LANG!=="de"?"E":t)+'</text>'; });
+    compass.innerHTML=s+'</svg>'; };
+  compass.addEventListener("pointerdown",e=>e.stopPropagation()); compass.addEventListener("click",()=>{ m.north=(mapNorth(m)+90)%360; m.upd=Date.now(); saveMaps(); drawCompass(); });
+  drawCompass(); box.appendChild(compass);
+  if(!src){ const ph=h("div",{class:"map-empty"},h("p",{},T2("Für diese Karte ist auf diesem Gerät noch kein Bild hinterlegt.","There is no image for this map on this device yet.")),h("button",{class:"btn btn-primary",onclick:()=>mapPickImage(u=>{ MAPIMG[m.id]=u; if(saveMapImg()){ delete MAP_DIM[m.id]; delete MAP_VIEW[m.id]; render(); } })},"🖼 "+T2("Kartenbild laden","Load the map image"))); ph.addEventListener("pointerdown",e=>e.stopPropagation()); box.appendChild(ph); }
+  else{ img.addEventListener("load",()=>{ MAP_DIM[m.id]={w:img.naturalWidth,h:img.naturalHeight}; W=img.naturalWidth; H=img.naturalHeight; sizeAreas(); if(v.auto) fit(); else{ clampV(); layout(); } }); img.src=src; }
+  setMode(MAP_UI.mode);
+  wrap.appendChild(box);
+  /* gestures: drag = move the map / a marker, two fingers or wheel = zoom */
+  const pts=new Map(); let drag=null, pinch=null;
+  const loc=e=>{ const r=box.getBoundingClientRect(), k=r.width/(box.offsetWidth||r.width)||1; return [(e.clientX-r.left)/k,(e.clientY-r.top)/k]; };
+  const norm=(lx,ly)=>({x:clamp((lx-v.tx)/(W*v.s),0,1),y:clamp((ly-v.ty)/(H*v.s),0,1)});
+  const place=(lx,ly)=>{
+    const md=MAP_UI.mode, q=norm(lx,ly);
+    if(md==="party"){ setMode("move"); setParty(q.x,q.y); return; }
+    if(md==="ruler"){ m.route.push({x:q.x,y:q.y,t:(m.route.length?m.route[m.route.length-1].t:"road")||"road"}); m.upd=Date.now(); saveMaps(); layout(); renderTravel(); return; }
+    if(md==="scale"){ MAP_UI.scalePts.push(q); layout(); if(MAP_UI.scalePts.length>=2){ const a=MAP_UI.scalePts[0], b=MAP_UI.scalePts[1], px=Math.hypot((a.x-b.x)*W,(a.y-b.y)*H);
+        askText(T2("Wie viele Meilen liegen zwischen den beiden Punkten?","How many miles are between the two points?"),"100",val=>{ const miles=parseFloat(String(val).replace(",",".")); if(miles>0&&px>2){ m.mpw=Math.round(miles/px*W*10)/10; m.upd=Date.now(); saveMaps(); toast("📐 "+T2("Maßstab gesetzt: die Kartenbreite entspricht ","Scale set: the map width equals ")+fmt(m.mpw)); } MAP_UI.scalePts=[]; setMode("move"); layout(); renderTravel(); },{onCancel:()=>{ MAP_UI.scalePts=[]; setMode("move"); layout(); }}); } return; }
+    const mk={id:uid(),t:md==="text"?"text":"pin",x:q.x,y:q.y,title:"",note:""};
+    if(md==="text"){ mk.c=MAP_COLORS[2]; mk.sz=1; } else { mk.ic="📍"; mk.c=MAP_COLORS[0]; }
+    m.marks.push(mk); m.upd=Date.now(); saveMaps(); setMode("move"); openEdit(mk.id); renderList();
+  };
+  box.addEventListener("pointerdown",e=>{
+    if(e.pointerType==="mouse"&&e.button!==0) return; try{ box.setPointerCapture(e.pointerId); }catch(x){}
+    const p=loc(e); pts.set(e.pointerId,p);
+    if(pts.size===2){ const a=[...pts.values()]; pinch={d:Math.hypot(a[0][0]-a[1][0],a[0][1]-a[1][1])||1,cx:(a[0][0]+a[1][0])/2,cy:(a[0][1]+a[1][1])/2}; cancelPaint(); drag=null; return; }
+    if(MAP_UI.mode==="paint"){ startPaint(p,e.pointerId); return; }
+    const el=e.target.closest&&e.target.closest(".map-mark"), mk=el&&MAP_UI.mode==="move"?idx[el.dataset.id]:null;
+    drag={kind:mk?"mark":(MAP_UI.mode==="move"?"pan":"add"),mk,sx:p[0],sy:p[1],tx:v.tx,ty:v.ty,ox:mk?mk.x:0,oy:mk?mk.y:0,moved:false,pid:e.pointerId};
+  });
+  box.addEventListener("pointermove",e=>{
+    if(!pts.has(e.pointerId)) return; const p=loc(e); pts.set(e.pointerId,p);
+    if(pinch&&pts.size>=2){ const a=[...pts.values()], d=Math.hypot(a[0][0]-a[1][0],a[0][1]-a[1][1])||1, cx=(a[0][0]+a[1][0])/2, cy=(a[0][1]+a[1][1])/2; v.tx+=cx-pinch.cx; v.ty+=cy-pinch.cy; zoomAt(d/pinch.d,cx,cy); pinch.d=d; pinch.cx=cx; pinch.cy=cy; return; }
+    if(!drag||e.pointerId!==drag.pid) return;
+    if(drag.kind==="paint"){ paintMove(p); return; }
+    const dx=p[0]-drag.sx, dy=p[1]-drag.sy; if(!drag.moved&&Math.hypot(dx,dy)<6) return; drag.moved=true;
+    if(drag.kind==="mark"&&!MAP_UI.lock){ drag.mk.x=clamp(drag.ox+dx/(W*v.s),0,1); drag.mk.y=clamp(drag.oy+dy/(H*v.s),0,1); layout(); }
+    else if(drag.kind==="pan"||drag.kind==="mark"||(drag.kind==="add"&&MAP_UI.mode!=="pin"&&MAP_UI.mode!=="text")){ v.tx=drag.tx+dx; v.ty=drag.ty+dy; v.auto=false; clampV(); layout(); }
+  });
+  const up=e=>{
+    if(!pts.has(e.pointerId)) return; pts.delete(e.pointerId); if(pts.size<2) pinch=null;
+    if(!drag||e.pointerId!==drag.pid) return; const d=drag; drag=null;
+    if(d.kind==="paint"){ paintEnd(); return; }
+    if(d.kind==="mark"){ if(d.moved&&!MAP_UI.lock){ if(d.mk.t==="arealab") d.mk.auto=false; touch(); renderList(); renderTravel(); } else if(!d.moved) openEdit(d.mk.t==="arealab"?"area:"+d.mk.aid:d.mk.id); }
+    else if(d.kind==="add"&&!d.moved) place(d.sx,d.sy);
+    else if(d.kind==="pan"&&!d.moved){ const ha=areaAt(d.sx,d.sy); if(ha) openEdit("area:"+ha.id); else if(MAP_UI.edit) closeEdit(); }
+  };
+  box.addEventListener("pointerup",up); box.addEventListener("pointercancel",up); box.addEventListener("contextmenu",e=>e.preventDefault());
+  box.addEventListener("wheel",e=>{ e.preventDefault(); const p=loc(e); zoomAt(Math.exp(-e.deltaY*(e.deltaMode===1?0.05:0.0015)),p[0],p[1]); },{passive:false});
+  box.addEventListener("dblclick",e=>{ if(MAP_UI.mode!=="move"||(e.target.closest&&e.target.closest(".map-mark,.map-edit,.map-zoomctl"))) return; const p=loc(e); zoomAt(2,p[0],p[1]); });
+  /* ---- travel card: route, pace, rests, exhaustion ---- */
+  const trCard=h("div",{class:"card",style:"margin-top:10px"}), trBody=h("div",{});
+  trCard.appendChild(h("div",{class:"row",style:"gap:8px;align-items:center;flex-wrap:wrap"},h("b",{},"🧭 "+T2("Reise & Lineal","Travel & ruler")),h("span",{class:"space"}),
+    h("span",{class:"small muted",id:"mapScaleLab"},""),
+    h("button",{class:"btn btn-sm",title:T2("Maßstab prüfen oder neu eichen","Check or calibrate the scale"),onclick:()=>setMode("scale")},"📐 "+T2("Maßstab","Scale"))));
+  trCard.appendChild(trBody); wrap.appendChild(trCard);
+  function renderTravel(){
+    const tv=m.travel=Object.assign({},MAP_TRAVEL_DEF,m.travel||{}), party=m.marks.find(x=>x.t==="party"), rl=mapRouteLegs(m,W,H);
+    const sl=trCard.querySelector("#mapScaleLab"); if(sl) sl.textContent=T2("Kartenbreite ≈ ","Map width ≈ ")+fmt(mapMpw(m))+(m.mpw?"":(m.id==="map_myrthora"?T2(" (nach deinem 100-Meilen-Balken)"," (from your 100-mile bar)"):T2(" (noch nicht geeicht)"," (not calibrated yet)")));
+    trBody.textContent="";
+    const num=(label,key,opts)=>{ opts=opts||{}; return h("label",{class:"map-fld"},h("span",{class:"small muted"},label),h("input",{type:"number",value:tv[key],step:opts.step||1,min:opts.min==null?0:opts.min,style:"width:100%",onchange:e=>{ const x=parseFloat(String(e.target.value).replace(",",".")); tv[key]=isNaN(x)?MAP_TRAVEL_DEF[key]:x; touch(); calc(); }})); };
+    const sel=(label,key,list)=>h("label",{class:"map-fld"},h("span",{class:"small muted"},label),h("select",{style:"width:100%",onchange:e=>{ tv[key]=e.target.value; touch(); calc(); }},...list.map(o=>h("option",{value:o[0],selected:tv[key]===o[0]},T2(o[1],o[2])))));
+    /* route */
+    const routeBox=h("div",{});
+    routeBox.appendChild(h("div",{class:"row",style:"gap:6px;flex-wrap:wrap;align-items:center"},
+      h("button",{class:"btn btn-sm"+(MAP_UI.mode==="ruler"?" btn-primary":""),onclick:()=>{ setMode(MAP_UI.mode==="ruler"?"move":"ruler"); renderTravel(); box.scrollIntoView({block:"nearest"}); }},"📏 "+T2("Wegpunkte setzen","Set waypoints")),
+      h("button",{class:"btn btn-sm",disabled:!m.route.length,onclick:()=>{ m.route.pop(); touch(); layout(); renderTravel(); }},"↶ "+T2("Letzter Punkt","Last point")),
+      h("button",{class:"btn btn-sm btn-danger",disabled:!m.route.length,onclick:()=>{ m.route=[]; touch(); layout(); renderTravel(); }},"🗑 "+T2("Route löschen","Clear route")),
+      m.trail.length?h("button",{class:"btn btn-sm",title:T2("Die gepunktete Spur der bisherigen Gruppenstandorte entfernen","Remove the dotted trail of earlier party positions"),onclick:()=>{ m.trail=[]; touch(); layout(); renderTravel(); }},"⌫ "+T2("Spur löschen","Clear trail")):null,
+      h("label",{class:"small",style:"display:flex;gap:6px;align-items:center;margin-left:auto"},h("input",{type:"checkbox",checked:!!tv.fromParty,disabled:!party,onchange:e=>{ tv.fromParty=e.target.checked; touch(); layout(); renderTravel(); }}),party?T2("Start = Standort der Gruppe","Start = party's position"):T2("(Gruppen-Marker setzen für den Start)","(set the party marker to start there)"))));
+    if(rl.legs.length){ const tbl=h("div",{class:"map-legs"}); rl.legs.forEach((l,i)=>tbl.appendChild(h("div",{class:"map-leg"},h("span",{class:"small muted"},(i+1)+". "),h("b",{},fmt(l.mi)),h("select",{style:"flex:1;min-width:140px;max-width:340px",onchange:e=>{ const pt=(rl.pts.length>m.route.length)?m.route[i]:m.route[i+1]; if(pt){ pt.t=e.target.value; touch(); calc(); } }},...MAP_TERR.map(o=>h("option",{value:o[0],selected:l.tr[0]===o[0]},T2(o[1],o[2])+(o[3]<1?" ×"+(o[3]===0.5?"½":"⅓"):"")))))));
+      routeBox.appendChild(tbl); }
+    else routeBox.appendChild(h("p",{class:"small muted",style:"margin:6px 0 0"},T2("Noch keine Strecke. Mit „📏 Wegpunkte setzen“ tippst du auf der Karte Punkt für Punkt den Weg an (Luftlinie von Punkt zu Punkt – setze mehr Punkte, um Flüssen und Wegen zu folgen). Oder tippe bei einem Ort auf „📏 Route hierhin“. Oder trage unten die Meilen von Hand ein.","No route yet. Use “📏 Set waypoints” and tap the way on the map point by point (straight lines between points – set more points to follow rivers and roads). Or use “📏 Route here” on a place. Or enter the miles by hand below.")));
+    trBody.appendChild(routeBox);
+    if(!rl.legs.length) trBody.appendChild(h("div",{class:"map-grid",style:"margin-top:8px"},num(T2("Strecke von Hand (Meilen)","Distance by hand (miles)"),"manual",{step:1})));
+    trBody.appendChild(h("div",{class:"small muted",style:"margin:10px 0 4px"},T2("Reise","Journey")));
+    trBody.appendChild(h("div",{class:"map-grid"},
+      num(T2("Geschwindigkeit der Gruppe (ft)","Party speed (ft)"),"ft",{step:5,min:5}),sel(T2("Tempo","Pace"),"pace",MAP_PACE),
+      num(T2("Marschstunden pro Tag","March hours per day"),"hours",{step:0.5,min:1}),
+      num(T2("Kurze Pausen pro Tag","Short breaks per day"),"breaks",{step:1}),num(T2("Dauer je Pause (Std.)","Length of each break (h)"),"breakH",{step:0.5}),
+      num(T2("Nachtruhe / lange Rast (Std.)","Night / long rest (h)"),"restH",{step:1}),num(T2("Aufbruch um (Uhr)","Departure at (o'clock)"),"start",{step:0.5}),
+      num(T2("Konstitution-Rettungswurf (Bonus)","Constitution save (bonus)"),"con",{step:1,min:-5}),num(T2("Erschöpfung jetzt (Stufe)","Exhaustion now (level)"),"exh",{step:1})));
+    trBody.appendChild(out); calc();
+  }
+  const out=h("div",{class:"map-out"});
+  function calc(){
+    const tv=m.travel, rl=mapRouteLegs(m,W,H), miles=rl.legs.length?rl.total:(tv.manual||0); out.textContent="";
+    if(!(miles>0)){ out.appendChild(h("p",{class:"small muted",style:"margin:8px 0 0"},T2("Sobald eine Strecke da ist, erscheint hier die Reisezeit.","The travel time appears here as soon as there is a distance."))); drawOverlay(); return; }
+    const r=mapTravelCalc(m,miles,rl.legs), tx=(a,b)=>T2(a,b);
+    const hrs=r.T, d=Math.floor(hrs/r.H), rest=hrs-d*r.H;
+    out.appendChild(h("div",{class:"map-sum"},
+      h("div",{},h("span",{class:"small muted"},tx("Strecke","Distance")),h("b",{},fmt(miles))),
+      h("div",{},h("span",{class:"small muted"},tx("Marschzeit","Marching time")),h("b",{},nf(hrs)+" "+tx("Std.","h"))),
+      h("div",{},h("span",{class:"small muted"},tx("Tage unterwegs","Days on the road")),h("b",{},String(r.days))),
+      h("div",{},h("span",{class:"small muted"},tx("Übernachtungen","Nights")),h("b",{},String(r.nights))),
+      h("div",{},h("span",{class:"small muted"},tx("Ankunft","Arrival")),h("b",{},r.arrive?tx("Tag ","Day ")+r.arrive.day+", "+mapClock(r.arrive.t):"–"))));
+    out.appendChild(h("p",{class:"small",style:"margin:8px 0 0"},tx("Tempo: ","Speed: ")+nf(r.mph)+" "+tx("Meilen pro Stunde","miles per hour")+" ("+nf(r.mph*r.H)+" "+tx("Meilen pro "+r.H+"-Std.-Marsch auf freiem Land","miles per "+r.H+"-hour march on open ground")+")."));
+    if(r.warn) out.appendChild(h("p",{class:"small",style:"margin:6px 0 0;color:var(--bad)"},"⚠ "+r.warn));
+    const days=h("details",{style:"margin-top:6px"},h("summary",{class:"small"},tx("Tag für Tag anzeigen","Show day by day")));
+    r.rows.forEach(x=>days.appendChild(h("div",{class:"small",style:"margin:3px 0"},h("b",{},tx("Tag ","Day ")+x.day+": "),mapClock(x.start)+" – "+mapClock(x.end)+" · "+nf(x.march)+" "+tx("Std. Marsch","h march")+(x.breaks?" + "+x.breaks+" "+tx("Pause(n)","break(s)"):"")+" · ≈ "+fmt(x.mi)+(x.day<r.days?" · "+tx("dann Nachtruhe ("+tv.restH+" Std.)","then night rest ("+tv.restH+" h)"):""))));
+    out.appendChild(days);
+    if(r.forced){
+      const p3=r.dist.slice(3).reduce((s,x)=>s+x,0), p6=r.dist[6], pct=x=>Math.round(x*100)+" %";
+      out.appendChild(h("div",{class:"map-warn"},h("b",{},"⚠ "+tx("Gewaltmarsch","Forced march")),h("div",{class:"small",style:"margin-top:3px"},tx(
+        "Mehr als 8 Marschstunden am Tag: nach jeder Stunde über 8 ein Konstitutions-Rettungswurf (SG 10 + Anzahl der Zusatzstunden). Bei Misserfolg +1 Stufe Erschöpfung. Mit deiner Hausregel (−1 auf alle Würfe pro Stufe) und einer langen Rast pro Nacht (−1 Stufe) ergibt das:","More than 8 marching hours a day: after every hour beyond 8 make a Constitution save (DC 10 + number of extra hours). On a failure: +1 level of exhaustion. With your house rule (−1 to all rolls per level) and one long rest per night (−1 level) this gives:")),
+        h("div",{class:"small",style:"margin-top:4px"},tx("Erwartete Erschöpfung bei Ankunft: Stufe ","Expected exhaustion on arrival: level ")+nf(r.exp)+" · "+tx("Wahrscheinlichkeit für Stufe 3 oder mehr: ","chance of level 3 or more: ")+pct(p3)+(p6>0.005?" · "+tx("Stufe 6 (Tod): ","level 6 (death): ")+pct(p6):"")),
+        h("div",{class:"small muted",style:"margin-top:3px"},tx("Verteilung (Stufe 0–6): ","Distribution (level 0–6): ")+r.dist.map(x=>pct(x)).join(" · "))));
+    }else if(tv.exh>0) out.appendChild(h("p",{class:"small muted",style:"margin:6px 0 0"},tx("Hinweis: Mit deiner Hausregel hat Erschöpfung nur −1 auf Würfe pro Stufe, keine Tempo-Änderung – darum ändert sie die Reisezeit nicht.","Note: with your house rule exhaustion only gives −1 to rolls per level, no speed change – so it does not change the travel time.")));
+    drawOverlay();
+  }
+  /* list of all markers of this map */
+  const listCard=h("div",{class:"card",style:"margin-top:10px"}), listBody=h("div",{});
+  function renderList(){
+    listBody.textContent=""; const q=MAP_UI.q.trim().toLowerCase();
+    m.areas.filter(a=>!q||(a.name||"").toLowerCase().includes(q)).forEach(a=>listBody.appendChild(h("button",{class:"map-row",onclick:()=>{ centerOn(a.lab,1.5); openEdit("area:"+a.id); box.scrollIntoView({block:"nearest"}); }},h("span",{class:"map-rowic",style:"background:"+a.c},a.kind==="pen"?"✏":"🖌"),h("span",{style:"flex:1;min-width:0;text-align:left"},h("b",{},a.name||T2("(Zeichnung)","(drawing)")),h("span",{class:"small muted",style:"display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"},a.note||(a.kind==="pen"?T2("Zeichnung","Drawing"):T2("Gebiet","Area")))))));
+    const rows=m.marks.filter(mk=>!q||((mk.title||"")+" "+(mk.note||"")).toLowerCase().includes(q)).sort((a,b)=>(a.t==="party"?0:1)-(b.t==="party"?0:1)||(a.title||"").localeCompare(b.title||"","de"));
+    listHead.textContent=T2("Markierungen & Gebiete auf dieser Karte","Markers & areas on this map")+" ("+(m.marks.length+m.areas.length)+")";
+    if(!rows.length){ listBody.appendChild(h("p",{class:"muted small",style:"margin:6px 0 0"},m.marks.length?T2("Nichts gefunden.","Nothing found."):T2("Noch keine Markierungen – mit „📍 Marker“ oder „📝 Hinweistext“ anlegen.","No markers yet – add some with “📍 Marker” or “📝 Note”."))); return; }
+    rows.forEach(mk=>listBody.appendChild(h("button",{class:"map-row",onclick:()=>{ centerOn(mk,2.5); openEdit(mk.id); box.scrollIntoView({block:"nearest"}); }},
+      h("span",{class:"map-rowic",style:"background:"+(mk.t==="party"?"#f1c40f":(mk.c||(mk.t==="text"?MAP_COLORS[2]:MAP_COLORS[0])))},mk.t==="party"?"🧭":mk.t==="text"?"📝":(mk.ic||"📍")),
+      h("span",{style:"flex:1;min-width:0;text-align:left"},h("b",{},mk.title||(mk.t==="text"?T2("(Hinweistext)","(note)"):T2("(ohne Namen)","(unnamed)"))),mk.note?h("span",{class:"small muted",style:"display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"},mk.note):null))));
+  }
+  const listHead=h("b",{});
+  listCard.appendChild(h("div",{class:"row",style:"gap:8px;align-items:center;flex-wrap:wrap"},listHead,h("span",{class:"space"}),h("input",{type:"search",placeholder:"🔎 "+T2("Suchen …","Search …"),value:MAP_UI.q,style:"width:200px;max-width:100%",oninput:e=>{ MAP_UI.q=e.target.value; renderList(); }})));
+  listCard.appendChild(listBody); wrap.appendChild(listCard); renderList(); renderTravel();
+  wrap.appendChild(h("p",{class:"small muted",style:"margin:6px 2px"},T2("Zoomen: Mausrad, zwei Finger oder + / −; verschieben: ziehen. Alles wird automatisch gespeichert (und mit dem Online-Abgleich gesichert). Marker, Hinweistexte und der Gruppen-Marker lassen sich frei verschieben; mit „🔒 Fixieren“ geht das nicht mehr aus Versehen. Die Reisezeit folgt den 5e-Reiseregeln (Tempo, 8 Stunden Marsch, schwieriges Gelände halbiert das Tempo, Gewaltmarsch).","Zoom: mouse wheel, two fingers or + / −; move: drag. Everything is saved automatically (and backed up by the online sync). Markers, notes and the party marker can be dragged freely; “🔒 Lock” prevents moving them by accident. The travel time follows the 5e travel rules (pace, 8 hours of marching, difficult terrain halves the speed, forced march).")));
+  requestAnimationFrame(()=>{ sizeAreas(); buildMarks(); buildEdit(); if(!src){ fit(); } else if(MAP_DIM[m.id]&&v.auto){ fit(); } else if(MAP_DIM[m.id]){ clampV(); layout(); }
+    if(window.ResizeObserver){ let t=null; new ResizeObserver(()=>{ clearTimeout(t); t=setTimeout(()=>{ if(!box.isConnected) return; if(v.auto) fit(); else{ clampV(); layout(); } },100); }).observe(box); } });
+  return wrap;
+}
+(function initMap(){ const b=document.getElementById("btnMap"); if(b) b.addEventListener("click",()=>{ state.view=state.view==="map"?null:"map"; render(); }); })();
 (function initInk(){ const b=document.getElementById("btnInk"); if(b) b.addEventListener("click",()=>{ state.view=state.view==="ink"?null:"ink"; render(); }); })();
 (function initBooks(){ const bt=document.getElementById("btnBooks"); if(bt) bt.addEventListener("click",()=>{ state.view=state.view==="books"?null:"books"; render(); });
   const q=document.getElementById("btnQualfa"); if(q) q.addEventListener("click",()=>{ state.view=state.view==="diary"?null:"diary"; render(); }); })();
