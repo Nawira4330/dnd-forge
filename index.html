@@ -2758,9 +2758,9 @@ function charLanguages(c){
 }
 /* ---------------- Exhaustion (2014: 6 levels with fixed effects · 2024: -2 per level on D20 Tests, -5 ft speed per level) ---------------- */
 function exhLvl(c){ const n=Math.round(Number(c&&c.exhaustion)||0); return n<0?0:n>6?6:n; }
-function exhPen(c){ return c&&c.ruleset==="2024"?-2*exhLvl(c):0; }
-function exhDis(c,kind){ if(!c||c.ruleset==="2024") return false; const x=exhLvl(c); return kind==="check"?x>=1:x>=3; }
-function hpMax(c){ const b=hpMaxBase(c); return (exhLvl(c)>=4&&c.ruleset!=="2024")?Math.max(1,Math.floor(b/2)):b; }
+function exhPen(c){ return c?-(c.ruleset==="2024"?2:1)*exhLvl(c):0; }
+function exhDis(c,kind){ return false; }   // house rule: penalties instead of disadvantage
+function hpMax(c){ return hpMaxBase(c); }
 function setExhaustion(c,n){
   const before=hpCur(c), oldMax=hpMax(c); c.exhaustion=Math.max(0,Math.min(6,Math.round(n)||0)); const newMax=hpMax(c);
   if(newMax<oldMax) c.hp.current=Math.min(before,newMax); else if(newMax>oldMax&&c.hp.current==null) c.hp.current=before;
@@ -2768,13 +2768,11 @@ function setExhaustion(c,n){
 function exhaustionEffects(c){
   const x=exhLvl(c); if(!x) return [];
   if(c.ruleset==="2024"){ const o=[T2("−"+2*x+" auf alle D20 Tests (Checks, Saves, Attack Rolls)","−"+2*x+" on all D20 Tests (checks, saves, attack rolls)"),"Speed −"+5*x+" ft"]; if(x>=6) o.push("☠ "+T2("Tod","Death")); return o; }
-  const o=[]; if(x>=1) o.push(T2("Nachteil auf Ability Checks","Disadvantage on ability checks")); if(x>=2&&x<5) o.push(T2("Speed halbiert","Speed halved"));
-  if(x>=3) o.push(T2("Nachteil auf Attack Rolls und Saves","Disadvantage on attack rolls and saves")); if(x>=4) o.push(T2("Max HP halbiert","HP maximum halved"));
-  if(x>=5) o.push("Speed 0"); if(x>=6) o.push("☠ "+T2("Tod","Death")); return o;
+  return [T2("−"+x+" auf alle Würfe (Fertigkeiten, Rettungswürfe, Angriffe, Initiative, Zauber-SG)","−"+x+" on all rolls (skills, saves, attacks, initiative, spell DC)")];
 }
 function exhaustionRow(c){
   const x=exhLvl(c), fx=exhaustionEffects(c);
-  const row=h("div",{class:"row",style:"margin-top:8px;gap:4px;flex-wrap:wrap;align-items:center",title:c.ruleset==="2024"?T2("Regeln 2024: −2 pro Stufe auf D20 Tests, −5 ft Speed pro Stufe, Stufe 6 = Tod. Lange Rast: −1.","2024 rules: −2 per level on D20 Tests, −5 ft speed per level, level 6 = death. Long rest: −1."):T2("Regeln 2014: 1 Nachteil auf Checks · 2 Speed halbiert · 3 Nachteil auf Attacks/Saves · 4 Max HP halbiert · 5 Speed 0 · 6 Tod. Lange Rast: −1.","2014 rules: 1 disadvantage on checks · 2 speed halved · 3 disadvantage on attacks/saves · 4 HP max halved · 5 speed 0 · 6 death. Long rest: −1.")},
+  const row=h("div",{class:"row",style:"margin-top:8px;gap:4px;flex-wrap:wrap;align-items:center",title:c.ruleset==="2024"?T2("Regeln 2024: −2 pro Stufe auf D20 Tests, −5 ft Speed pro Stufe, Stufe 6 = Tod. Lange Rast: −1.","2024 rules: −2 per level on D20 Tests, −5 ft speed per level, level 6 = death. Long rest: −1."):T2("Hausregel: −1 pro Stufe auf alle Würfe (Fertigkeiten, Rettungswürfe, Angriffe, Initiative, Zauber-SG). Lange Rast: −1.","House rule: −1 per level on all rolls (skills, saves, attacks, initiative, spell DC). Long rest: −1.")},
     h("span",{class:"small",style:"font-weight:600;margin-right:4px"},"😩 Exhaustion"),
     ...[0,1,2,3,4,5,6].map(n=>h("button",{class:"btn btn-sm"+(n===x?" btn-primary":""),style:"min-width:32px"+(n===6&&x===6?";background:var(--bad);border-color:var(--bad)":""),onclick:()=>{ setExhaustion(c,n); saveChars(); render(); }},String(n))));
   const box=h("div",{},row);
@@ -2882,7 +2880,7 @@ function baseSpeed(c){
   // Wood elf 2014 already 35 in data; barbarian fast movement & monk handled as note
   let v = s + Number(c.speedMisc||0) + fxSum(c,"speed");
   const x=exhLvl(c);
-  if(x){ if(c.ruleset==="2024") v=Math.max(0,v-5*x); else if(x>=5) v=0; else if(x>=2) v=Math.floor(v/2); }
+  if(x&&c.ruleset==="2024") v=Math.max(0,v-5*x);
   return v;
 }
 function armorClass(c){ return acParts(c).total; }
@@ -3010,7 +3008,7 @@ function spellcastingInfo(c){
   return casterClasses(c).map(({e,cls,caster,casterSrc})=>{
     const ab=caster.ability;
     const m=abMod(c,ab), p=pb(c);
-    const sx=fxSum(c,"spell"), dc=8+p+m+sx, atk=p+m+sx+exhPen(c);
+    const sx=fxSum(c,"spell"), dc=8+p+m+sx+exhPen(c), atk=p+m+sx+exhPen(c);
     let cantrips=0;
     const ct=caster.cantrips || CANTRIPS_KNOWN[cls.id];
     if(ct){ Object.keys(ct).map(Number).sort((a,b)=>a-b).forEach(k=>{ if(e.level>=k) cantrips=ct[k]; }); }
@@ -3960,7 +3958,7 @@ function hpPanel(c){
   box.appendChild(row);
   box.appendChild(hitDicePanel(c));
   box.appendChild(exhaustionRow(c));
-  if(exhLvl(c)>=6) box.appendChild(h("div",{style:"margin-top:6px;padding:6px 10px;border-radius:8px;background:var(--bad);color:#fff;font-weight:600"},"☠ Exhaustion 6 – "+T2("der Charakter ist gestorben","the character dies")));
+  if(exhLvl(c)>=6&&c.ruleset==="2024") box.appendChild(h("div",{style:"margin-top:6px;padding:6px 10px;border-radius:8px;background:var(--bad);color:#fff;font-weight:600"},"☠ Exhaustion 6 – "+T2("der Charakter ist gestorben","the character dies")));
   return box;
 }
 
@@ -4165,7 +4163,7 @@ function tabOverview(c){
   const saves=saveProfs(c);
   const ab=h("div",{class:"ov-abil"});
   ABILITIES.forEach(a=>{ const on=saves.has(a.id);
-    ab.appendChild(h("div",Object.assign({class:"ability-box"},rollAttrs(L(a)+" "+T2("Probe","check"),fa[a.id].mod),{class:"ability-box rollable"}),h("div",{class:"name"},L(a)),h("div",{class:"mod"},sign(fa[a.id].mod)),h("div",{class:"score"},fa[a.id].total),
+    ab.appendChild(h("div",Object.assign({class:"ability-box"},rollAttrs(L(a)+" "+T2("Probe","check"),fa[a.id].mod+exhPen(c)),{class:"ability-box rollable"}),h("div",{class:"name"},L(a)),h("div",{class:"mod"},sign(fa[a.id].mod)),h("div",{class:"score"},fa[a.id].total),
       h("div",Object.assign({style:"margin-top:4px;display:flex;gap:4px;justify-content:center;align-items:center"},rollAttrs(L(a)+" Save",saveMod(c,a.id)),{class:"small rollable"}),h("span",{class:"prof"+(on?" on":"")}),h("span",{class:on?"":"muted"},"Save "+sign(saveMod(c,a.id))))));
   });
   wrap.appendChild(h("div",{class:"card"},h("h3",{style:"margin-top:0"},t("abilities")),ab,
