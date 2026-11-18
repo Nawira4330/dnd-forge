@@ -9009,7 +9009,7 @@ function inkView(){
 }
 
 /* ---------------- Karten: Landkarte mit Zoom, Markierungen, Hinweistexten, Reisemarker und Lineal mit Reisezeit ---------------- */
-const MAP_PACK="";
+const MAP_PACK="";const MAP_KEY="dnd_maps_v1", MAPIMG_KEY="dnd_mapimg_v1";
 let MAPS=Object.assign({maps:[],sel:"",seeded:0},loadJSON(MAP_KEY)||{}); if(!Array.isArray(MAPS.maps)) MAPS.maps=[];
 let MAPIMG=loadJSON(MAPIMG_KEY)||{}; if(typeof MAPIMG!=="object"||Array.isArray(MAPIMG)) MAPIMG={};
 function saveMaps(){ try{ localStorage.setItem(MAP_KEY,JSON.stringify(MAPS)); return true; }
