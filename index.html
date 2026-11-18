@@ -28,6 +28,9 @@
   .hd-panel{margin-top:10px;padding:8px 10px;border:1px solid var(--line);border-radius:var(--radius);background:var(--panel2)}
   .hd-die{min-width:38px;padding:4px 8px;border:1px solid var(--line);border-radius:7px;background:var(--panel);color:var(--text);font:600 12px system-ui,sans-serif;cursor:pointer}
   .hd-die.spent{text-decoration:line-through;opacity:.4;background:transparent}
+  .ds-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px;padding:6px 10px;border:1px solid var(--line);border-radius:var(--radius);background:var(--panel2)}
+  .ds-dot{width:20px;height:20px;border-radius:50%;border:2px solid var(--line);background:transparent;padding:0;cursor:pointer}
+  .ds-dot.ok.on{background:var(--good);border-color:var(--good)} .ds-dot.bad.on{background:var(--bad);border-color:var(--bad)}
   *{box-sizing:border-box}
   html,body{margin:0;padding:0;background:var(--bg);color:var(--text);
     font-family:"Segoe UI",system-ui,Roboto,Arial,sans-serif;font-size:14px;line-height:1.45}
@@ -3875,6 +3878,42 @@ function welcome(){
 
 /* ---------------- HP quick panel (damage / healing) + lock for core settings ---------------- */
 function hpCur(c){ return c.hp.current==null?hpMax(c):c.hp.current; }
+/* ---- Death saves: 3 successes / 3 failures; reset when healed above 0 HP or on a long rest ---- */
+function dth(c){ if(!c.death||typeof c.death!=="object") c.death={s:0,f:0}; c.death.s=Math.max(0,Math.min(3,Math.round(Number(c.death.s)||0))); c.death.f=Math.max(0,Math.min(3,Math.round(Number(c.death.f)||0))); return c.death; }
+function deathSaveRoll(c){
+  const d=dth(c), r=1+Math.floor(Math.random()*20), pen=exhPen(c), tot=r+pen; let res;
+  if(r===20){ d.s=0; d.f=0; c.hp.current=Math.max(1,hpCur(c)); res=T2("Natürliche 20: wieder bei Bewusstsein mit 1 TP","Natural 20: back on your feet with 1 HP"); }
+  else if(r===1){ d.f=Math.min(3,d.f+2); res=T2("Natürliche 1: 2 Fehlschläge","Natural 1: 2 failures"); }
+  else if(tot>=10){ d.s=Math.min(3,d.s+1); res=T2("Erfolg","Success"); }
+  else { d.f=Math.min(3,d.f+1); res=T2("Fehlschlag","Failure"); }
+  if(d.f>=3) res+=" · ☠ "+T2("gestorben","dead"); else if(d.s>=3) res+=" · ✓ "+T2("stabil","stable");
+  saveChars(); render(); toast("🎲 d20 "+r+(pen?" "+sign(pen)+" = "+tot:"")+" → "+res);
+}
+function deathSavesRow(c){
+  const d=dth(c), zero=hpCur(c)<=0, row=h("div",{class:"ds-row"+(zero||d.s||d.f?"":" ds-quiet")});
+  const dots=(key,cls)=>{ const w=h("span",{style:"display:inline-flex;gap:5px"}); for(let i=0;i<3;i++) w.appendChild(h("button",{class:"ds-dot "+cls+(i<d[key]?" on":""),title:T2("Antippen = setzen / zurücknehmen","Tap = set / undo"),onclick:()=>{ d[key]=(i<d[key])?i:i+1; saveChars(); render(); }})); return w; };
+  row.appendChild(h("b",{style:"font-size:13px"},"☠ "+t("deathSaves")));
+  row.appendChild(h("span",{class:"small muted"},T2("Erfolge","Successes"))); row.appendChild(dots("s","ok"));
+  row.appendChild(h("span",{class:"small muted"},T2("Fehlschläge","Failures"))); row.appendChild(dots("f","bad"));
+  row.appendChild(h("button",{class:"btn btn-sm",title:T2("d20 würfeln: 10+ Erfolg, 1 = zwei Fehlschläge, 20 = 1 TP (Exhaustion-Abzug wird eingerechnet)","Roll d20: 10+ success, 1 = two failures, 20 = 1 HP (exhaustion penalty included)"),onclick:()=>deathSaveRoll(c)},"🎲 "+T2("Würfeln","Roll")));
+  if(d.s||d.f) row.appendChild(h("button",{class:"btn btn-sm btn-ghost",onclick:()=>{ d.s=0; d.f=0; saveChars(); render(); }},T2("Zurücksetzen","Reset")));
+  if(d.f>=3) row.appendChild(h("span",{style:"color:var(--bad);font-weight:700"},"☠ "+T2("gestorben","dead")));
+  else if(d.s>=3) row.appendChild(h("span",{style:"color:var(--good);font-weight:700"},"✓ "+T2("stabil","stable")));
+  return row;
+}
+function longRestModal(c){
+  const body=h("div",{}), x=exhLvl(c); let exh=false;
+  body.appendChild(h("h2",{style:"margin-top:0"},"🌙 "+T2("Lange Rast","Long rest")));
+  body.appendChild(h("p",{class:"small"},T2("TP voll, Temp-TP weg, alle Zauberplätze und Wild-Shape-Nutzungen zurück, eigene Fähigkeiten zurück, Death Saves zurückgesetzt, die Hälfte der Trefferwürfel (mindestens 1) zurück.","Full HP, temp HP gone, all spell slots and Wild Shape uses back, custom abilities back, death saves reset, half of the Hit Dice (at least 1) back.")));
+  if(x>0) body.appendChild(h("label",{class:"row small",style:"gap:6px;align-items:center;margin:8px 0"},h("input",{type:"checkbox",onchange:e=>{ exh=e.target.checked; }}),"😩 "+T2("Exhaustion um 1 senken (jetzt Stufe "+x+")","Lower exhaustion by 1 (now level "+x+")")));
+  body.appendChild(h("div",{class:"row",style:"gap:8px;margin-top:10px"},
+    h("button",{class:"btn btn-primary",onclick:()=>{
+      hdRegainHalf(c); if(exh&&exhLvl(c)>0) setExhaustion(c,exhLvl(c)-1); c.hp.current=null; c.hp.temp=0; c.slotsUsed={}; c.death={s:0,f:0};
+      (c.customAbilities||[]).forEach(a=>{ a.used=0; }); if(c.wild){ c.wild.used=0; c.wild.active=null; }
+      saveChars(); closeModal(); render(); toast(T2("Lange Rast abgeschlossen","Long rest finished")); }},"🌙 "+T2("Lange Rast","Long rest")),
+    h("span",{class:"space"}),h("button",{class:"btn btn-ghost",onclick:closeModal},t("cancel"))));
+  modal(body,{width:480});
+}
 function dealDamage(c,n){
   let rest=Math.max(0,Math.floor(n)); const msg=[T2("−"+rest+" Schaden","−"+rest+" damage")];
   const W=c.wild;
@@ -3883,6 +3922,7 @@ function dealDamage(c,n){
     msg.push(T2(dealt+" auf Tier-TP","beast HP −"+dealt));
     if(W.hp<=0){ W.active=null; msg.push(T2("Tiergestalt endet","Wild Shape ends")); }
   }
+  if(rest>0&&hpCur(c)<=0&&(c.hp.temp||0)<=0){ const d=dth(c); d.f=Math.min(3,d.f+1); msg.push(T2("Schaden bei 0 TP: 1 Fehlschlag (Death Save)","Damage at 0 HP: 1 failed death save")); }
   if(rest>0){
     const tmp=c.hp.temp||0, ab=Math.min(tmp,rest); c.hp.temp=tmp-ab; rest-=ab;
     if(ab) msg.push(T2(ab+" von Temp-TP absorbiert",ab+" absorbed by temp HP"));
@@ -3947,15 +3987,13 @@ function hpPanel(c){
   const act=(fn)=>()=>{ const n=val(); if(n==null) return; const m=fn(n); saveChars(); render(); if(m) toast(m); };
   const row=h("div",{class:"row hp-row"},amt,
     h("button",{class:"btn btn-sm btn-danger",onclick:act(n=>dealDamage(c,n))},"💥 "+T2("Schaden","Damage")),
-    h("button",{class:"btn btn-sm",style:"border-color:var(--good)",onclick:act(n=>{ const before=hpCur(c); c.hp.current=Math.min(hpMax(c),before+n); return T2("+"+(c.hp.current-before)+" TP geheilt","+"+(c.hp.current-before)+" HP healed"); })},"💚 "+T2("Heilung","Healing")),
+    h("button",{class:"btn btn-sm",style:"border-color:var(--good)",onclick:act(n=>{ const before=hpCur(c); c.hp.current=Math.min(hpMax(c),before+n); if(before<=0&&c.hp.current>0) c.death={s:0,f:0}; return T2("+"+(c.hp.current-before)+" TP geheilt","+"+(c.hp.current-before)+" HP healed"); })},"💚 "+T2("Heilung","Healing")),
     h("button",{class:"btn btn-sm",onclick:act(n=>{ c.hp.temp=Math.max(c.hp.temp||0,n); return T2("Temp-TP: "+c.hp.temp,"Temp HP: "+c.hp.temp); })},"🛡 "+T2("Temp-TP","Temp HP")),
-    h("button",{class:"btn btn-sm",title:T2("TP, Temp-TP, Zauberplätze und Wild-Shape-Nutzungen zurücksetzen","Reset HP, temp HP, spell slots and Wild Shape uses"),onclick:()=>{
-      askYes(T2("Lange Rast: TP voll, Temp-TP weg, Zauberplätze und Wild Shape zurücksetzen, Exhaustion −1, die Hälfte der Trefferwürfel (mindestens 1) zurück?","Long rest: full HP, no temp HP, reset spell slots and Wild Shape, Exhaustion −1, half of the Hit Dice (at least 1) back?"),()=>{
-      hdRegainHalf(c); if(exhLvl(c)>0) setExhaustion(c,exhLvl(c)-1); c.hp.current=null; c.hp.temp=0; c.slotsUsed={}; (c.customAbilities||[]).forEach(a=>{ a.used=0; }); if(c.wild){ c.wild.used=0; c.wild.active=null; }
-      saveChars(); render(); toast(T2("Lange Rast abgeschlossen","Long rest finished")); },{danger:false,yes:T2("Lange Rast","Long rest")}); }},"🌙 "+T2("Lange Rast","Long rest")));
+    h("button",{class:"btn btn-sm",title:T2("TP, Temp-TP, Zauberplätze, Wild-Shape, Trefferwürfel und Death Saves zurücksetzen","Reset HP, temp HP, spell slots, Wild Shape, Hit Dice and death saves"),onclick:()=>longRestModal(c)},"🌙 "+T2("Lange Rast","Long rest")));
   if(c.wild&&c.wild.active&&WS_BY_ID[c.wild.active]&&c.ruleset!=="2024")
     box.appendChild(h("div",{class:"small muted",style:"margin-top:4px"},"🐾 "+WS_BY_ID[c.wild.active].name+": "+c.wild.hp+"/"+WS_BY_ID[c.wild.active].hp+" "+T2("Tier-TP (Schaden trifft zuerst diese)","beast HP (damage hits these first)")));
   box.appendChild(row);
+  box.appendChild(deathSavesRow(c));
   box.appendChild(hitDicePanel(c));
   box.appendChild(exhaustionRow(c));
   if(exhLvl(c)>=6&&c.ruleset==="2024") box.appendChild(h("div",{style:"margin-top:6px;padding:6px 10px;border-radius:8px;background:var(--bad);color:#fff;font-weight:600"},"☠ Exhaustion 6 – "+T2("der Charakter ist gestorben","the character dies")));
@@ -7277,7 +7315,7 @@ function buildSheet(c){
     // death saves + inspiration
     let dy=abTop+2+4*22;
     p.text(rx,dy,t("deathSaves")+"  (S / F)",{bold:true,size:5.6,color:"0.35 0.35 0.35"});
-    p.box(rx,dy+1.5,rw,12); p.f("p1_death",rx,dy+1.5,rw,12,"");
+    p.box(rx,dy+1.5,rw,12); p.f("p1_death",rx,dy+1.5,rw,12,(dth(c).s||dth(c).f)?"S "+dth(c).s+"/3  F "+dth(c).f+"/3":"");
     dy+=20;
     p.text(rx,dy,t("inspiration"),{bold:true,size:5.6,color:"0.35 0.35 0.35"});
     p.box(rx,dy+1.5,rw,12); p.f("p1_insp",rx,dy+1.5,rw,12,"");
