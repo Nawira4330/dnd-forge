@@ -18,7 +18,14 @@
   }
   /* colour themes (Settings in the sidebar): the dark theme above is the default */
   html[data-theme="hell"]{ color-scheme:light; --bg:#f3f0e8; --panel:#ffffff; --panel2:#ebe6da; --line:#bdb5a2; --text:#1b1913; --muted:#55503f; --accent:#a8341f; --accent2:#8f4309; --good:#2b7a3c; --bad:#b32d2d; --gold:#7a5c0c; }
-  html[data-theme="pergament"]{ color-scheme:light; --bg:#eadbb8; --panel:#f6ecd3; --panel2:#e6d4a9; --line:#b9a06b; --text:#2a1f10; --muted:#5e4d2c; --accent:#9c3524; --accent2:#85430c; --good:#2f7336; --bad:#a82a2a; --gold:#6f5208; }
+  html[data-theme="pergament"]{ color-scheme:light; --bg:#e6d5aa; --panel:#f8efd7; --panel2:#e4d1a4; --line:#9c8350; --text:#1d1407; --muted:#4a3b1c; --accent:#9c3524; --accent2:#7a3a08; --good:#256a2d; --bad:#a02323; --gold:#7a5a05; }
+  html[data-theme="pergament"] .skill-row .prof,html[data-theme="hell"] .skill-row .prof{ border-color:#6f5f3c; }
+  html[data-theme="pergament"] .skill-row .prof.on,html[data-theme="hell"] .skill-row .prof.on{ background:#d9a21b; border-color:#7a5200; }
+  html[data-theme="pergament"] .skill-row .prof.exp{ background:#9c3524; border-color:#6a2012; box-shadow:0 0 0 3px #f8efd7 inset; }
+  html[data-theme="hell"] .skill-row .prof.exp{ background:#a8341f; border-color:#6a2012; box-shadow:0 0 0 3px #ffffff inset; }
+  html[data-theme="pergament"] .skill-row .prof.half,html[data-theme="hell"] .skill-row .prof.half{ background:linear-gradient(90deg,#d9a21b 50%,transparent 50%); }
+  html[data-theme="pergament"] .slot,html[data-theme="hell"] .slot{ border-color:#7a5200; background:#d9a21b; }
+  html[data-theme="pergament"] .slot.used,html[data-theme="hell"] .slot.used{ background:transparent; }
   html[data-theme="kontrast"]{ --bg:#000000; --panel:#0d0e11; --panel2:#1b1d23; --line:#7b8396; --text:#ffffff; --muted:#d6dbe6; --accent:#e0553f; --accent2:#f0a050; --good:#5fd07a; --bad:#ff6b6b; --gold:#ffd86b; }
   html[data-theme="hell"] .inv-row:hover,html[data-theme="pergament"] .inv-row:hover{ background:rgba(0,0,0,.05); }
   html[data-theme="hell"] .btn-danger,html[data-theme="pergament"] .btn-danger{ color:var(--bad); border-color:var(--bad); }
@@ -46,7 +53,7 @@
   .btn{background:var(--panel2);border:1px solid var(--line);color:var(--text);
     border-radius:7px;padding:6px 12px;display:inline-flex;gap:6px;align-items:center}
   .btn:hover{border-color:var(--accent2)}
-  .btn-primary{background:var(--accent);border-color:var(--accent)}
+  .btn-primary{background:var(--accent);border-color:var(--accent);color:#fff}
   .btn-primary:hover{background:#c94d38}
   .btn-ghost{background:transparent}
   .btn-sm{padding:3px 8px;font-size:12px}
@@ -128,6 +135,8 @@
   .choice.sel{border-color:var(--accent);background:#2b2118}
   .choice .t{font-weight:600;font-size:13px}
   .choice .d{font-size:11px;color:var(--muted)}
+  .fey-chip{cursor:pointer;font:600 11px system-ui,sans-serif;border-color:var(--good);color:var(--good)}
+  .fey-chip.used{border-color:var(--line);color:var(--muted);text-decoration:line-through}
   .tag{font-size:10px;background:var(--panel2);border:1px solid var(--line);border-radius:4px;padding:1px 5px;color:var(--muted)}
   .flex-h{display:flex;gap:16px;flex-wrap:wrap}
   .col{flex:1;min-width:280px}
@@ -159,7 +168,7 @@
   .hp-bar{position:relative;height:22px;border-radius:6px;background:var(--panel2);border:1px solid var(--line);overflow:hidden;margin-bottom:8px}
   .hp-fill{position:absolute;inset:0 auto 0 0;background:var(--good);transition:width .2s}
   .hp-bar.low .hp-fill{background:var(--bad)}
-  .hp-txt{position:relative;z-index:1;display:block;text-align:center;font-weight:700;line-height:20px;text-shadow:0 1px 2px #000}
+  .hp-txt{position:relative;z-index:1;display:block;text-align:center;font-weight:700;line-height:20px;color:#fff;text-shadow:0 0 3px #000,0 1px 2px #000}
   .hp-row{gap:6px;flex-wrap:wrap}
   .hp-amt{width:90px!important}
   .lockbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;border:1px dashed var(--line);border-radius:8px;padding:8px 12px;margin-bottom:12px;background:var(--panel2)}
@@ -312,6 +321,119 @@
   .book.bk-diary::before{content:"";position:absolute;left:0;right:0;bottom:12px;height:8px;background:linear-gradient(#d9b74a,#9c7a1f);box-shadow:0 1px 2px rgba(0,0,0,.6)}
   .book.bk-diary::after{content:"";position:absolute;right:6px;top:-2px;bottom:-12px;width:5px;background:#a03232;box-shadow:0 0 0 1px rgba(0,0,0,.35)}
   @media(pointer:coarse),(hover:none){.book.bk-diary{width:48px}}
+/* zoom-media:start (generated: the width breakpoints below also react to the text-size setting) */
+  @media(max-width:1035px){
+html[data-zoom="115"] .g3,html[data-zoom="115"] .g4,html[data-zoom="115"] .g6{grid-template-columns:repeat(2,1fr)}
+html[data-zoom="115"] .sidebar{width:200px}
+  }
+  @media(max-width:690px){
+html[data-zoom="115"] .ws-abil{grid-template-columns:repeat(3,1fr)}
+  }
+  @media(max-width:874px){
+html[data-zoom="115"] .app{flex-direction:column}
+html[data-zoom="115"] .sidebar{position:static;width:auto;height:auto;overflow:visible;align-self:stretch}
+html[data-zoom="115"] .main{padding:12px}
+html[data-zoom="115"] .skills-grid{columns:1}
+html[data-zoom="115"] .tabs-main{overflow-x:auto;flex-wrap:nowrap}
+html[data-zoom="115"] .tab{white-space:nowrap;padding:9px 10px}
+  }
+  @media(max-width:989px){
+html[data-zoom="115"] .ov-abil{grid-template-columns:repeat(3,1fr)}
+html[data-zoom="115"] .ov-grid{grid-template-columns:1fr;grid-template-rows:none}
+html[data-zoom="115"] .ov-grid>.ov-skills,html[data-zoom="115"] .ov-grid>.ov-right,html[data-zoom="115"] .ov-grid>.ov-special{grid-column:auto;grid-row:auto}
+  }
+  @media(max-width:805px){
+html[data-zoom="115"] .save-label{display:none}
+  }
+  @media(max-width:1035px){
+html[data-zoom="115"] .ppl-detail{grid-template-columns:1fr}
+html[data-zoom="115"] .pp{padding:20px 20px 24px}
+html[data-zoom="115"] .pp-img{width:110px}
+  }
+  @media(max-width:1265px){
+html[data-zoom="115"] .app{display:block}
+html[data-zoom="115"] .sidebar{position:fixed;left:0;top:0;bottom:0;width:290px;max-width:88vw;height:100vh;height:100dvh;z-index:48;transform:translateX(-104%);transition:transform .2s;overflow:auto;box-shadow:6px 0 24px rgba(0,0,0,.55)}
+html[data-zoom="115"] .app.side-open .sidebar{transform:none}
+html[data-zoom="115"] .side-scrim{display:none;position:fixed;inset:0;z-index:47;background:rgba(0,0,0,.5)}
+html[data-zoom="115"] .app.side-open .side-scrim{display:block}
+html[data-zoom="115"] .topbar{display:flex}
+html[data-zoom="115"] .tabs-main{top:53px}
+  }
+  @media(max-width:1170px){
+html[data-zoom="130"] .g3,html[data-zoom="130"] .g4,html[data-zoom="130"] .g6{grid-template-columns:repeat(2,1fr)}
+html[data-zoom="130"] .sidebar{width:200px}
+  }
+  @media(max-width:780px){
+html[data-zoom="130"] .ws-abil{grid-template-columns:repeat(3,1fr)}
+  }
+  @media(max-width:988px){
+html[data-zoom="130"] .app{flex-direction:column}
+html[data-zoom="130"] .sidebar{position:static;width:auto;height:auto;overflow:visible;align-self:stretch}
+html[data-zoom="130"] .main{padding:12px}
+html[data-zoom="130"] .skills-grid{columns:1}
+html[data-zoom="130"] .tabs-main{overflow-x:auto;flex-wrap:nowrap}
+html[data-zoom="130"] .tab{white-space:nowrap;padding:9px 10px}
+  }
+  @media(max-width:1118px){
+html[data-zoom="130"] .ov-abil{grid-template-columns:repeat(3,1fr)}
+html[data-zoom="130"] .ov-grid{grid-template-columns:1fr;grid-template-rows:none}
+html[data-zoom="130"] .ov-grid>.ov-skills,html[data-zoom="130"] .ov-grid>.ov-right,html[data-zoom="130"] .ov-grid>.ov-special{grid-column:auto;grid-row:auto}
+  }
+  @media(max-width:910px){
+html[data-zoom="130"] .save-label{display:none}
+  }
+  @media(max-width:1170px){
+html[data-zoom="130"] .ppl-detail{grid-template-columns:1fr}
+html[data-zoom="130"] .pp{padding:20px 20px 24px}
+html[data-zoom="130"] .pp-img{width:110px}
+  }
+  @media(max-width:1430px){
+html[data-zoom="130"] .app{display:block}
+html[data-zoom="130"] .sidebar{position:fixed;left:0;top:0;bottom:0;width:290px;max-width:88vw;height:100vh;height:100dvh;z-index:48;transform:translateX(-104%);transition:transform .2s;overflow:auto;box-shadow:6px 0 24px rgba(0,0,0,.55)}
+html[data-zoom="130"] .app.side-open .sidebar{transform:none}
+html[data-zoom="130"] .side-scrim{display:none;position:fixed;inset:0;z-index:47;background:rgba(0,0,0,.5)}
+html[data-zoom="130"] .app.side-open .side-scrim{display:block}
+html[data-zoom="130"] .topbar{display:flex}
+html[data-zoom="130"] .tabs-main{top:53px}
+  }
+  @media(max-width:1350px){
+html[data-zoom="150"] .g3,html[data-zoom="150"] .g4,html[data-zoom="150"] .g6{grid-template-columns:repeat(2,1fr)}
+html[data-zoom="150"] .sidebar{width:200px}
+  }
+  @media(max-width:900px){
+html[data-zoom="150"] .ws-abil{grid-template-columns:repeat(3,1fr)}
+  }
+  @media(max-width:1140px){
+html[data-zoom="150"] .app{flex-direction:column}
+html[data-zoom="150"] .sidebar{position:static;width:auto;height:auto;overflow:visible;align-self:stretch}
+html[data-zoom="150"] .main{padding:12px}
+html[data-zoom="150"] .skills-grid{columns:1}
+html[data-zoom="150"] .tabs-main{overflow-x:auto;flex-wrap:nowrap}
+html[data-zoom="150"] .tab{white-space:nowrap;padding:9px 10px}
+  }
+  @media(max-width:1290px){
+html[data-zoom="150"] .ov-abil{grid-template-columns:repeat(3,1fr)}
+html[data-zoom="150"] .ov-grid{grid-template-columns:1fr;grid-template-rows:none}
+html[data-zoom="150"] .ov-grid>.ov-skills,html[data-zoom="150"] .ov-grid>.ov-right,html[data-zoom="150"] .ov-grid>.ov-special{grid-column:auto;grid-row:auto}
+  }
+  @media(max-width:1050px){
+html[data-zoom="150"] .save-label{display:none}
+  }
+  @media(max-width:1350px){
+html[data-zoom="150"] .ppl-detail{grid-template-columns:1fr}
+html[data-zoom="150"] .pp{padding:20px 20px 24px}
+html[data-zoom="150"] .pp-img{width:110px}
+  }
+  @media(max-width:1650px){
+html[data-zoom="150"] .app{display:block}
+html[data-zoom="150"] .sidebar{position:fixed;left:0;top:0;bottom:0;width:290px;max-width:88vw;height:100vh;height:100dvh;z-index:48;transform:translateX(-104%);transition:transform .2s;overflow:auto;box-shadow:6px 0 24px rgba(0,0,0,.55)}
+html[data-zoom="150"] .app.side-open .sidebar{transform:none}
+html[data-zoom="150"] .side-scrim{display:none;position:fixed;inset:0;z-index:47;background:rgba(0,0,0,.5)}
+html[data-zoom="150"] .app.side-open .side-scrim{display:block}
+html[data-zoom="150"] .topbar{display:flex}
+html[data-zoom="150"] .tabs-main{top:53px}
+  }
+/* zoom-media:end */
 </style>
 <script src="config.js"></script>
 </head>
@@ -2874,7 +2996,7 @@ function saveMod(c,ab){
   const m=abMod(c,ab), p=pb(c);
   return m + (saveProfs(c).has(ab)?p:0) + fxSum(c,"saves") + exhPen(c);
 }
-function passivePerception(c){ return 10 + skillMod(c,"perception") - (exhDis(c,"check")?5:0); }
+function passivePerception(c){ return 10 + skillMod(c,"perception") + ((c.ruleset!=="2024"&&hasFeat(c,"observant"))?5:0) - (exhDis(c,"check")?5:0); }
 
 /* --- speed / AC / HP --- */
 function baseSpeed(c){
@@ -4195,6 +4317,7 @@ function specialFeatures(c){
 }
 function tabOverview(c){
   const wrap=h("div",{});
+  feyTouchedTrackers(c);
   if(pendingChoices(c).length) wrap.appendChild(pendingPanel(c));
   const fa=finalAbilities(c), sp=speciesById(c.speciesId);
   // 1 attributes with saving throws
@@ -4283,12 +4406,12 @@ function tabOverview(c){
   const spellEntries={bonus:[],reaction:[],action:[]};
   [...new Set(pool)].map(id=>spellById(id)).filter(Boolean).sort((x,y)=>x.level-y.level||L(x.name).localeCompare(L(y.name))).forEach(sp=>{
     const tm=String(sp.time||"").toLowerCase(), k=/bonus action/.test(tm)?"bonus":/reaction/.test(tm)?"reaction":/^1 action/.test(tm)?"action":null; if(!k) return;
-    spellEntries[k].push({school:sp.school?schoolEn(sp.school):"???",range:sp.range,src:sp.level===0?T2("Zaubertrick","Cantrip"):T2("Zauber","Spell")+" "+sp.level,name:L(sp.name),
+    spellEntries[k].push({sid:sp.id,school:sp.school?schoolEn(sp.school):"???",range:sp.range,src:sp.level===0?T2("Zaubertrick","Cantrip"):T2("Zauber","Spell")+" "+sp.level,name:L(sp.name),
       desc:[sp.range,sp.duration,sp.conc?t("concentration"):""].filter(Boolean).join(" · ")+" — "+L(sp.sum||{en:""})+spellExtra(c,sp)+(spellCost(sp)?"  💰 "+spellCost(sp).text:"")});
   });
   const group=(title,list,collapsed)=>{ if(!list.length) return;
     const body=h("div",{});
-    list.forEach(f=>body.appendChild(h("details",{class:"spell-item"},h("summary",{class:"hd"},h("span",{class:"nm"},f.name),h("span",{class:"tag"},f.src),f.school?h("span",{class:"tag",title:T2("Magieschule","School of magic")},"🔮 "+f.school):null,f.range?h("span",{class:"tag",title:t("range")},"📏 "+f.range):null),h("div",{class:"sp-body small"},f.desc))));
+    list.forEach(f=>body.appendChild(h("details",{class:"spell-item"},h("summary",{class:"hd"},h("span",{class:"nm"},f.name),h("span",{class:"tag"},f.src),f.school?h("span",{class:"tag",title:T2("Magieschule","School of magic")},"🔮 "+f.school):null,f.range?h("span",{class:"tag",title:t("range")},"📏 "+f.range):null,f.sid?feyChip(c,f.sid):null),h("div",{class:"sp-body small"},f.desc))));
     if(collapsed) spc.appendChild(h("details",{class:"inv-group"},h("summary",{},title+" ("+list.length+")"),body));
     else{ spc.appendChild(h("h4",{style:"margin:12px 0 4px;color:var(--gold)"},title+" ("+list.length+")")); spc.appendChild(body); } };
   group(T2("Bonusaktionen","Bonus actions"),[...sf.bonus,...spellEntries.bonus]);
@@ -4306,9 +4429,24 @@ function tabOverview(c){
 
 /* ---------------- TAB: Abilities (Fähigkeiten) – animal forms, all features, own special things ---------------- */
 const FEAT_UI={q:""};
+/* "+1 gratis" chip for a spell that Fey Touched lets you cast once per long rest for free (shares its state with the tracker under Abilities) */
+function feyChip(c,spellId){
+  if(!c||!Array.isArray(c.customAbilities)) return null; const a=c.customAbilities.find(x=>x.auto==="fey:"+spellId); if(!a) return null;
+  const used=(a.used||0)>=Math.max(1,Number(a.max)||1);
+  return h("button",{class:"tag fey-chip"+(used?" used":""),title:T2("Gratis-Zauber aus Fey Touched: einmal pro lange Rast. Antippen = benutzt / zurücknehmen. Die lange Rast setzt es zurück.","Free cast from Fey Touched: once per long rest. Tap = used / undo. A long rest resets it."),
+    onclick:ev=>{ ev.preventDefault(); ev.stopPropagation(); a.used=used?0:Math.max(1,Number(a.max)||1); saveChars(); render(); }},used?"✗ "+T2("Gratis benutzt","Free cast used"):"✦ +1 "+T2("gratis","free"));
+}
+function feyTouchedTrackers(c){
+  if(!Array.isArray(c.customAbilities)) c.customAbilities=[];
+  if(!(hasFeat(c,"fey-touched")||hasFeat(c,"fey-touched-14"))) return;
+  const noted=Object.keys(c.spellNotes||{}).filter(k=>/Fey Touched|^\*/i.test(String(c.spellNotes[k]))), ids=noted.length?noted:["misty-step"]; let add=false;
+  ids.forEach(id=>{ if(c.customAbilities.some(a=>a.auto==="fey:"+id)) return; const sp=spellById(id);
+    c.customAbilities.push({id:uid(),auto:"fey:"+id,name:"Fey Touched: "+(sp?L(sp.name):id)+" ("+T2("gratis, 1× pro lange Rast","free, 1× per long rest")+")",desc:T2("Aus dem Talent Fey Touched: einmal pro lange Rast ohne Zauberplatz wirken. Kreis anklicken, wenn benutzt; die lange Rast setzt ihn zurück.","From the Fey Touched feat: cast once per long rest without a spell slot. Tap the circle when used; a long rest resets it."),max:1,used:0}); add=true; });
+  if(add) saveChars();
+}
 function tabFeatures(c){
   const wrap=h("div",{});
-  if(!Array.isArray(c.customAbilities)) c.customAbilities=[];
+  feyTouchedTrackers(c);
   if(wsRules(c)){
     const d=h("details",{style:"margin-bottom:12px"},h("summary",{class:"bsum",style:"cursor:pointer;padding:6px 2px"},h("h3",{style:"display:inline;margin:0"},"🐾 "+T2("Tierformen (Wild Shape)","Animal forms (Wild Shape)"))),tabWildShape(c));
     d.open=true; wrap.appendChild(d);
@@ -4668,6 +4806,7 @@ function spellRow(c,s){
   hd.appendChild(h("span",{class:"tag",title:t("range"),style:"border-color:var(--accent2);color:var(--accent2)"},"📏 "+s.range));
   hd.appendChild(h("span",{class:"sp-meta small muted"},s.time+" · "+s.duration));
   hd.appendChild(h("span",{class:"space"}));
+  { const fc=feyChip(c,s.id); if(fc) hd.appendChild(fc); }
   const chip=(on,label,cb)=>toggleChip(on,label,ev=>{ ev.preventDefault(); ev.stopPropagation(); cb(); });
   if(s.level===0) hd.appendChild(chip(isC,t("known"),()=>{ tog(c.spells.cantrips,s.id); commit(); }));
   else {
@@ -4690,6 +4829,7 @@ function levelHeader(s,cnt){
 }
 function tabSpells(c){
   const wrap=h("div",{});
+  feyTouchedTrackers(c);
   const sinfo=spellcastingInfo(c);
   c.slotsUsed=c.slotsUsed||{};
   if(!sinfo.length){
@@ -7132,6 +7272,8 @@ function perkEditor(c){
   return h("details",{style:"margin-top:10px"},h("summary",{class:"small",style:"cursor:pointer"},"✎ "+T2("Stufen & Vorteile anpassen","Edit levels & benefits")),box);
 }
 const repColor=(v,max)=>"hsl("+Math.round((clamp(v/max,-1,1)+1)/2*120)+",55%,45%)";
+const repInk=(v,max)=>{ const light=/^(hell|pergament)$/.test(document.documentElement.getAttribute("data-theme")||""); return "hsl("+Math.round((clamp(v/max,-1,1)+1)/2*120)+",60%,"+(light?27:50)+"%)"; };   // number colour that stays readable on light themes
+const repTxt=(v,max)=>{ const hue=Math.round((clamp(v/max,-1,1)+1)/2*120); return (hue>=35&&hue<=110)?"#111":"#fff"; };   // dark text on the yellow-green middle of the colour scale
 const repFmt=n=>(n>0?"+":"")+String(n).replace(".",",");   // 5 → +5, -0.5 → -0,5
 const repNum=s=>{ const n=Number(String(s==null?"":s).trim().replace(",",".")); return isFinite(n)?Math.round(n*100)/100:NaN; };
 const FAC_UI={reason:{}, amt:{}, newName:""};
@@ -7167,8 +7309,8 @@ function facCard(c,f){
   return h("div",{class:"card"},
     h("div",{class:"row",style:"align-items:center;gap:8px;flex-wrap:wrap"},
       inp(f.name,val=>{ f.name=val.trim()||f.name; saveChars(); },{style:"font-weight:700;font-size:1.05em;flex:1;min-width:160px"}),
-      h("span",{class:"tag",style:"font-size:12px;color:#fff;background:"+col+";border-color:"+col},repTier(v,max)),
-      h("span",{style:"font-weight:700;min-width:46px;text-align:right;color:"+col},repFmt(v)),
+      h("span",{class:"tag",style:"font-size:12px;color:"+repTxt(v,max)+";background:"+col+";border-color:"+col},repTier(v,max)),
+      h("span",{style:"font-weight:700;min-width:46px;text-align:right;color:"+repInk(v,max)},repFmt(v)),
       h("button",{class:"btn btn-sm btn-danger",title:T2("Fraktion entfernen","Remove faction"),onclick:()=>{ askYes(T2("Fraktion „"+f.name+"“ samt Verlauf löschen?","Delete faction “"+f.name+"” including its history?"),()=>{ c.factions=c.factions.filter(x=>x.id!==f.id); commit(); }); }},"🗑")),
     half,
     h("div",{class:"row small muted",style:"justify-content:space-between"},h("span",{},"−"+max),h("span",{},"0"),h("span",{},"+"+max)),
@@ -7770,7 +7912,7 @@ termsCb.addEventListener("change",e=>{ TERMS_EN=e.target.checked; localStorage.s
     if(ts.value==="dark") root.removeAttribute("data-theme"); else root.setAttribute("data-theme",ts.value);
     if(zs.value==="100") root.removeAttribute("data-zoom"); else root.setAttribute("data-zoom",zs.value);
     const m=document.querySelector('meta[name="theme-color"]'); if(m) m.setAttribute("content",META[ts.value]); };
-  ts.addEventListener("change",()=>{ put("dnd_theme",ts.value); apply(); }); zs.addEventListener("change",()=>{ put("dnd_zoom",zs.value); apply(); });
+  ts.addEventListener("change",()=>{ put("dnd_theme",ts.value); apply(); try{ render(); }catch(e){} }); zs.addEventListener("change",()=>{ put("dnd_zoom",zs.value); apply(); });
   apply();
 })();
 $("#langSel").addEventListener("change",e=>{ LANG=e.target.value; localStorage.setItem("dnd_lang",LANG); render(); });
