@@ -219,8 +219,11 @@
   .statblock .abil b{display:block;color:var(--accent2);font-size:11px}
   .statblock p{margin:4px 0}
   .ov-abil{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
-  .ov-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start}
-  @media(max-width:860px){.ov-abil{grid-template-columns:repeat(3,1fr)}.ov-grid{grid-template-columns:1fr}}
+  .ov-grid{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto 1fr;gap:12px;align-items:start}
+  .ov-grid>.ov-skills{grid-column:1;grid-row:1}
+  .ov-grid>.ov-right{grid-column:2;grid-row:1 / span 2}
+  .ov-grid>.ov-special{grid-column:1;grid-row:2}   /* special abilities fill the gap under the skills */
+  @media(max-width:860px){.ov-abil{grid-template-columns:repeat(3,1fr)}.ov-grid{grid-template-columns:1fr;grid-template-rows:none}.ov-grid>.ov-skills,.ov-grid>.ov-right,.ov-grid>.ov-special{grid-column:auto;grid-row:auto}}
   .inv-group{margin-top:8px}
   .inv-group>summary{cursor:pointer;font-weight:700;color:var(--gold);border-bottom:1px solid var(--line);padding:4px 2px}
   .inv-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:6px 4px;border-bottom:1px solid var(--line)}
@@ -4170,7 +4173,7 @@ function tabOverview(c){
   const grid=h("div",{class:"ov-grid"}); wrap.appendChild(grid);
   // 2 skills (all, with bonus)
   const profs=skillProfs(c), exp=expertiseSkills(c);
-  const sk=h("div",{class:"card"},h("h3",{style:"margin-top:0"},t("skills")));
+  const sk=h("div",{class:"card ov-skills"},h("h3",{style:"margin-top:0"},t("skills")));
   const sg=h("div",{class:"skills-grid"});
   SKILLS.slice().sort((a,b)=>L(a).localeCompare(L(b))).forEach(s=>{
     sg.appendChild(h("div",Object.assign({},rollAttrs(L(s),skillMod(c,s.id)),{class:"skill-row rollable"}),h("span",{class:"prof"+(exp.has(s.id)?" exp":profs.has(s.id)?" on":"")}),
@@ -4178,7 +4181,7 @@ function tabOverview(c){
   });
   sk.appendChild(sg); grid.appendChild(sk);
   // right column: weapons, languages & proficiencies
-  const right=h("div",{}); grid.appendChild(right);
+  const right=h("div",{class:"ov-right"}); grid.appendChild(right);
   const wc=h("div",{class:"card"},h("h3",{style:"margin-top:0"},"⚔ "+T2("Ausgerüstete Waffen","Equipped weapons")));
   const eq=(c.inventory||[]).filter(it=>it.type==="weapon"&&it.equipped);
   if(eq.length){
@@ -4238,7 +4241,7 @@ function tabOverview(c){
   right.appendChild(pc);
   // 3 special abilities: sneak attack, bonus actions, reactions
   const sf=specialFeatures(c);
-  const spc=h("div",{class:"card"},h("h3",{style:"margin-top:0"},"✨ "+T2("Sonderfähigkeiten, Zauber & Aktionen","Special abilities, spells & actions")));
+  const spc=h("div",{class:"card ov-special"},h("h3",{style:"margin-top:0"},"✨ "+T2("Sonderfähigkeiten, Zauber & Aktionen","Special abilities, spells & actions")));
   // spells by casting time (cantrips + prepared; for casters that don't prepare: cantrips + known)
   const sp0=c.spells||{}, pool=(charPrepares(c)&&(sp0.prepared||[]).length)?[...(sp0.cantrips||[]),...sp0.prepared]:[...(sp0.cantrips||[]),...(sp0.known||[]),...(sp0.extra||[])];
   const spellEntries={bonus:[],reaction:[],action:[]};
@@ -4261,7 +4264,7 @@ function tabOverview(c){
   group(T2("Klassenmerkmale","Class features"),featureList(c).filter(r=>/\sL\d+$/.test(r[0])&&!used.has(r[1])&&!/ability score|attributswert|archetype|archetyp|subclass|unterklasse|spellcasting|zauberwirken/i.test(r[1])).map(r=>({src:r[0],name:r[1],desc:r[2]})),true);
   if(!spc.querySelector("h4,details")) spc.appendChild(h("p",{class:"muted small",style:"margin:0"},"—"));
   spc.appendChild(h("p",{class:"small muted",style:"margin:10px 0 0"},T2("Alle Merkmale (Spezies, Talente …) stehen im Reiter „Fähigkeiten“, alle Zauber im Reiter „Zauber“.","All features (species, feats …) are in the “Abilities” tab, all spells in the “Spells” tab.")));
-  wrap.appendChild(spc);
+  grid.appendChild(spc);
   return wrap;
 }
 
