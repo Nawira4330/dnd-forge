@@ -38,6 +38,16 @@
   .ds-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px;padding:6px 10px;border:1px solid var(--line);border-radius:var(--radius);background:var(--panel2)}
   .ds-dot{width:20px;height:20px;border-radius:50%;border:2px solid var(--line);background:transparent;padding:0;cursor:pointer}
   .ds-dot.ok.on{background:var(--good);border-color:var(--good)} .ds-dot.bad.on{background:var(--bad);border-color:var(--bad)}
+  .bk-ink{--c:#3b3b6b;--h:92px}
+  .ink-bar{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+  .ink-sticky{position:sticky;top:0;z-index:20;background:var(--bg);padding:8px 0;border-bottom:1px solid var(--line);margin-top:8px}
+  .ink-page{margin-top:8px;max-width:1000px;border:1px solid var(--line);border-radius:var(--radius);background:var(--panel);overflow:auto}
+  .ink-zoom{display:inline-flex;gap:4px;align-items:center}
+  .ink-cv{display:block;touch-action:none;cursor:crosshair}
+  .ink-page.eraser .ink-cv{cursor:cell}
+  .ink-page.scroll .ink-cv{touch-action:auto;pointer-events:none}
+  .ink-col{width:26px;height:26px;border-radius:50%;border:2px solid var(--line);cursor:pointer;font:700 11px system-ui,sans-serif;color:var(--text);background:var(--panel2);padding:0}
+  .ink-col.on{border-color:var(--gold);box-shadow:0 0 0 2px var(--gold)}
   *{box-sizing:border-box}
   html,body{margin:0;padding:0;background:var(--bg);color:var(--text);
     font-family:"Segoe UI",system-ui,Roboto,Arial,sans-serif;font-size:14px;line-height:1.45}
@@ -294,7 +304,7 @@
   .shelf{display:flex;align-items:flex-end;gap:3px;padding:12px 8px 0;margin:8px 0 16px;min-height:112px;background:linear-gradient(#15110d,#1d1710);border:1px solid #2c2118;border-bottom:12px solid #7a5230;border-radius:4px 4px 2px 2px;box-shadow:inset 0 8px 12px rgba(0,0,0,.6),0 3px 0 #4b3320,0 6px 8px rgba(0,0,0,.4)}
   .shelf.tools{min-height:104px}
   .book,.book:hover,.book.btn-primary,.book.btn-primary:hover{background:linear-gradient(90deg,rgba(255,255,255,.16) 0,rgba(255,255,255,0) 20%,rgba(0,0,0,.3) 100%),var(--c);border:0}
-  .book{--c:#7a2e2e;--h:110px;position:relative;flex:none;width:36px;height:var(--h);padding:7px 0 8px;border-radius:3px 3px 1px 1px;color:#f3e6c8;display:flex;flex-direction:column;align-items:center;justify-content:space-between;gap:4px;cursor:pointer;font:inherit;
+  .book{--c:#7a2e2e;--h:110px;position:relative;flex:0 1 auto;min-width:26px;width:36px;height:var(--h);padding:7px 0 8px;border-radius:3px 3px 1px 1px;color:#f3e6c8;display:flex;flex-direction:column;align-items:center;justify-content:space-between;gap:4px;cursor:pointer;font:inherit;
     box-shadow:1px 0 0 rgba(0,0,0,.55),inset 0 3px 0 rgba(212,175,55,.6),inset 0 -3px 0 rgba(212,175,55,.5);transition:transform .15s,box-shadow .15s}
   .book .bi{font-size:15px;line-height:1}
   .book .bt{writing-mode:vertical-rl;font:700 12px Georgia,"Times New Roman",serif;letter-spacing:.07em;white-space:nowrap;text-shadow:0 1px 1px rgba(0,0,0,.7)}
@@ -314,7 +324,7 @@
   .diary.btn-primary{box-shadow:0 0 0 2px var(--gold),0 3px 7px rgba(0,0,0,.55),inset -3px 0 0 rgba(212,175,55,.8)}
   @media(pointer:coarse),(hover:none){.book{width:44px}.book.bk-help{width:36px}.shelf{gap:4px}}
   /* Qualfas Tagebuch: its own leather diary with clasp and ribbon, leaning against the books */
-  .book.bk-diary{--c:#4a2f1a;--h:156px;width:40px;margin-left:8px;transform:rotate(4deg);transform-origin:bottom left}
+  .book.bk-diary{--c:#4a2f1a;--h:156px;width:40px;min-width:30px;margin-left:4px;transform:rotate(4deg);transform-origin:bottom left}
   .book.bk-diary:hover{transform:rotate(4deg) translateY(-5px)}
   .book.bk-diary.btn-primary{transform:rotate(2deg) translateY(-10px)}
   .book.bk-diary .bt{font-size:11px;letter-spacing:.03em}
@@ -460,6 +470,7 @@ html[data-zoom="150"] .tabs-main{top:53px}
         <button class="book bk-people" id="btnPeople" title="NPC Register"><span class="bi">📜</span><span class="bt">NPC Register</span></button>
         <button class="book bk-log" id="btnLog" title="Spiellog"><span class="bi">📓</span><span class="bt">Spiellog</span></button>
         <button class="book bk-lex" id="btnBooks" title="Lexikon"><span class="bi">📚</span><span class="bt">Lexikon</span></button>
+        <button class="book bk-ink" id="btnInk" title="Handnotizen – mit dem Stift schreiben und zeichnen"><span class="bi">✍</span><span class="bt">Handnotizen</span></button>
         <button class="book bk-diary" id="btnQualfa" title="Qualfas Tagebuch"><span class="bi">📔</span><span class="bt">Qualfas Tagebuch</span></button>
       </div>
       <div class="shelf tools" aria-label="Werkzeuge">
@@ -613,7 +624,7 @@ html[data-zoom="150"] .tabs-main{top:53px}
 /* ---------- Online-Abgleich (nur in der Online-Version): localStorage <-> private Datenbank ---------- */
 (function(){
   "use strict";
-  const SYNC=/^dnd_(characters_v1|homebrew_v1|group_v1|bestiary_v1|people_v1|sessions_v1|books_v1|seeded_books|seeded_people|seeded_chars|seeded_fenn|seeded_itemsen|seeded_sheet1|seeded_sheet2|seeded_sheet3|seeded_sheet4|seeded_sheet5|seeded_sheet6|seeded_sheet7|seeded_sheet8|seeded_sheet9|seeded_sheet10|seeded_sheet11|seeded_sheet12|seeded_sheet13)$/;
+  const SYNC=/^dnd_(characters_v1|ink_v1|homebrew_v1|group_v1|bestiary_v1|people_v1|sessions_v1|books_v1|seeded_books|seeded_people|seeded_chars|seeded_fenn|seeded_itemsen|seeded_sheet1|seeded_sheet2|seeded_sheet3|seeded_sheet4|seeded_sheet5|seeded_sheet6|seeded_sheet7|seeded_sheet8|seeded_sheet9|seeded_sheet10|seeded_sheet11|seeded_sheet12|seeded_sheet13)$/;
   const HASHK="dnd_sync_hash", META="dnd_sync_meta", DEVK="dnd_sync_dev", PEND="dnd_sync_pending", CHUNK=60000;
   const ls=window.localStorage;
   const rawSet=Storage.prototype.setItem, rawRemove=Storage.prototype.removeItem;
@@ -7824,13 +7835,14 @@ function render(){
   renderSidebar();
   $$("[data-i]").forEach(el=>{ el.textContent=t(el.getAttribute("data-i")); });
   const main=$("#main"); main.innerHTML="";
-  [["btnBestiary","bestiary"],["btnPeople","people"],["btnLog","log"],["btnBooks","books"],["btnQualfa","diary"]].forEach(([id,v])=>{ const e=$("#"+id); if(e) e.classList.toggle("btn-primary",state.view===v); });   // the book of the open view is pulled out of the shelf
+  [["btnBestiary","bestiary"],["btnPeople","people"],["btnLog","log"],["btnBooks","books"],["btnInk","ink"],["btnQualfa","diary"]].forEach(([id,v])=>{ const e=$("#"+id); if(e) e.classList.toggle("btn-primary",state.view===v); });   // the book of the open view is pulled out of the shelf
   const bb=$("#btnBestiary"); if(bb) bb.classList.toggle("btn-primary",state.view==="bestiary");
   if(state.view==="bestiary"){ try{ main.appendChild(bestiaryView()); }catch(err){ main.appendChild(h("div",{class:"card"},h("pre",{class:"small"},String(err&&err.stack||err)))); } return; }
   const pb=$("#btnPeople"); if(pb) pb.classList.toggle("btn-primary",state.view==="people");
   if(state.view==="people"){ try{ main.appendChild(peopleView()); }catch(err){ main.appendChild(h("div",{class:"card"},h("pre",{class:"small"},String(err&&err.stack||err)))); } return; }
   const lb=$("#btnLog"); if(lb) lb.classList.toggle("btn-primary",state.view==="log");
   if(state.view==="log"){ try{ main.appendChild(slogView()); }catch(err){ main.appendChild(h("div",{class:"card"},h("pre",{class:"small"},String(err&&err.stack||err)))); } return; }
+  if(state.view==="ink"){ try{ main.appendChild(inkView()); }catch(err){ main.appendChild(h("div",{class:"card"},h("pre",{class:"small"},String(err&&err.stack||err)))); } return; }
   const kb=$("#btnBooks"); if(kb) kb.classList.toggle("btn-primary",state.view==="books");
   const qb=$("#btnQualfa"); if(qb) qb.classList.toggle("btn-primary",state.view==="diary");
   if(state.view==="books"||state.view==="diary"){ const dm=state.view==="diary"; if(BOOKS_UI.diary!==dm){ BOOKS_UI.diary=dm; BOOKS_UI.sel=""; BOOKS_UI.q=""; BOOKS_UI.tag=""; } try{ main.appendChild(booksView()); }catch(err){ main.appendChild(h("div",{class:"card"},h("pre",{class:"small"},String(err&&err.stack||err)))); } return; }
@@ -8314,7 +8326,7 @@ function peopleDetail(e){
   const app=document.getElementById("app"), tg=document.getElementById("sideToggle"), sc=document.getElementById("sideScrim"), sb=document.querySelector(".sidebar");
   if(tg) tg.addEventListener("click",()=>app.classList.toggle("side-open"));
   const topT=document.getElementById("topTitle"), _rs=renderSidebar;
-  renderSidebar=function(){ _rs.apply(this,arguments); if(topT){ const c=curChar(); topT.textContent=state.view==="bestiary"?"📖 "+T2("Bestiarium","Bestiary"):state.view==="people"?"📜 "+T2("NPC Register","NPC register"):state.view==="log"?"📓 "+T2("Spiellog","Session log"):state.view==="books"?"📚 Lexikon":state.view==="diary"?"📔 Qualfas Tagebuch":(c&&c.name)||"D&D Forge"; } };
+  renderSidebar=function(){ _rs.apply(this,arguments); if(topT){ const c=curChar(); topT.textContent=state.view==="bestiary"?"📖 "+T2("Bestiarium","Bestiary"):state.view==="people"?"📜 "+T2("NPC Register","NPC register"):state.view==="log"?"📓 "+T2("Spiellog","Session log"):state.view==="books"?"📚 Lexikon":state.view==="diary"?"📔 Qualfas Tagebuch":state.view==="ink"?"✍ "+T2("Handnotizen","Handwritten notes"):(c&&c.name)||"D&D Forge"; } };
   if(sc) sc.addEventListener("click",()=>app.classList.remove("side-open"));
   if(sb) sb.addEventListener("click",e=>{ if(e.target.closest("button,.char-item")) setTimeout(()=>app.classList.remove("side-open"),50); });   // choosing something closes the menu
   try{ const cv=document.createElement("canvas"); cv.width=cv.height=180; const g=cv.getContext("2d");
@@ -8851,6 +8863,116 @@ function booksView(){
   }
   paint(); return wrap;
 }
+/* ---------------- Handnotizen: a notebook to write and draw with a pen (strokes are stored as small vector data) ---------------- */
+const INK_KEY="dnd_ink_v1", INK_W=900;
+let INK=Object.assign({pages:[]},loadJSON(INK_KEY)||{}); if(!Array.isArray(INK.pages)) INK.pages=[];
+function saveInk(){ try{ localStorage.setItem(INK_KEY,JSON.stringify(INK)); return true; }
+  catch(e){ toast("⚠ "+T2("Speicher voll – bitte Backup-Datei speichern","Storage full – please save a backup file")); return false; } }
+const INK_UI={sel:"",tool:"pen",color:"auto",size:1,mode:"draw",redo:[],zoom:1};
+const INK_SIZES=[1.6,2.8,5], INK_COLORS=[["auto","Aa"],["#c0392b",""],["#1f5fbf",""],["#2e7d32",""],["#b8860b",""]], INK_ZOOMS=[1,1.5,2,3,4];
+const inkNew=()=>({id:uid(),title:"",session:"",paper:"lined",h:1300,strokes:[],ts:Date.now(),upd:Date.now()});
+const inkPageName=p=>p.title||(T2("Seite vom ","Page of ")+new Date(p.ts).toLocaleDateString(LANG==="de"?"de-DE":"en-GB"));
+function inkCur(){ return INK.pages.find(p=>p.id===INK_UI.sel)||INK.pages[0]||null; }
+function inkInk(c,forced){ return c==="auto"?(forced||(getComputedStyle(document.documentElement).getPropertyValue("--text").trim()||"#e7e9ee")):c; }
+function inkStroke(g,s,forced){
+  const col=inkInk(s.c,forced), p=s.p; if(!p||!p.length) return; g.strokeStyle=col; g.fillStyle=col; g.lineCap="round"; g.lineJoin="round";
+  const wd=pr=>s.pr?s.w*(0.4+1.2*(pr==null?.5:pr)):s.w;
+  if(p.length===1){ g.beginPath(); g.arc(p[0][0],p[0][1],Math.max(.6,wd(p[0][2])/2),0,6.2832); g.fill(); return; }
+  for(let i=1;i<p.length;i++){ const a=p[i-1], b=p[i]; g.lineWidth=wd(((a[2]==null?.5:a[2])+(b[2]==null?.5:b[2]))/2); g.beginPath(); g.moveTo(a[0],a[1]); g.lineTo(b[0],b[1]); g.stroke(); }
+}
+function inkPaper(g,page,col){
+  if(page.paper==="blank") return; g.strokeStyle=col; g.lineWidth=1; g.beginPath();
+  for(let y=40;y<page.h;y+=40){ g.moveTo(0,y); g.lineTo(INK_W,y); }
+  if(page.paper==="grid") for(let x=40;x<INK_W;x+=40){ g.moveTo(x,0); g.lineTo(x,page.h); }
+  g.stroke();
+}
+/* the canvas is as wide as its box times the zoom; the pixel resolution is capped so that big zoom levels stay light */
+function inkDpr(cssW,cssH){ const want=window.devicePixelRatio||1; return Math.max(0.6,Math.min(want,Math.sqrt(16e6/(cssW*cssH)))); }
+function inkRepaint(cv,page){
+  const base=Math.max(280,cv.parentElement.clientWidth||INK_W), cssW=Math.round(base*INK_UI.zoom), sc=cssW/INK_W, cssH=Math.round(page.h*sc), dpr=inkDpr(cssW,cssH);
+  cv.style.width=cssW+"px"; cv.style.height=cssH+"px"; cv.width=Math.round(cssW*dpr); cv.height=Math.round(cssH*dpr); cv._dpr=dpr; cv._sc=sc;
+  const g=cv.getContext("2d"); g.setTransform(dpr*sc,0,0,dpr*sc,0,0); g.clearRect(0,0,INK_W,page.h);
+  inkPaper(g,page,"rgba(128,128,128,.28)"); page.strokes.forEach(s=>inkStroke(g,s));
+}
+function inkAttach(cv,page,onChange){
+  let cur=null, erasing=false, saveT=null;
+  const pos=e=>{ const r=cv.getBoundingClientRect(), sc=INK_W/r.width; return [Math.round((e.clientX-r.left)*sc*10)/10,Math.round((e.clientY-r.top)*sc*10)/10]; };
+  const commit=()=>{ page.upd=Date.now(); clearTimeout(saveT); saveT=setTimeout(()=>{ saveInk(); },250); if(onChange) onChange(); };
+  const eraseAt=pt=>{ const R=16/Math.max(1,INK_UI.zoom*0.8); const n=page.strokes.length; page.strokes=page.strokes.filter(s=>!s.p.some(q=>Math.hypot(q[0]-pt[0],q[1]-pt[1])<R)); if(page.strokes.length!==n){ inkRepaint(cv,page); return true; } return false; };
+  cv.addEventListener("pointerdown",e=>{
+    if(INK_UI.mode!=="draw"||(e.pointerType==="mouse"&&e.button!==0)) return; e.preventDefault(); try{ cv.setPointerCapture(e.pointerId); }catch(x){}
+    const pt=pos(e);
+    if(INK_UI.tool==="eraser"){ erasing=true; cur={erased:false}; if(eraseAt(pt)) cur.erased=true; return; }
+    const pen=e.pointerType==="pen";
+    /* zoomed in, the nib gets finer so that small handwriting stays readable */
+    cur={c:INK_UI.color,w:Math.round((INK_SIZES[INK_UI.size]||2.8)/Math.pow(INK_UI.zoom,0.8)*100)/100,pr:pen?1:0,p:[[pt[0],pt[1],pen?Math.round((e.pressure||.5)*100)/100:undefined]]};
+  });
+  cv.addEventListener("pointermove",e=>{
+    if(!cur) return; e.preventDefault(); const ce=e.getCoalescedEvents?e.getCoalescedEvents():[], evs=ce.length?ce:[e];
+    if(erasing){ evs.forEach(ev=>{ if(eraseAt(pos(ev))) cur.erased=true; }); return; }
+    const g=cv.getContext("2d"), dpr=cv._dpr||1, sc=cv._sc||1; g.setTransform(dpr*sc,0,0,dpr*sc,0,0);
+    evs.forEach(ev=>{ const pt=pos(ev), last=cur.p[cur.p.length-1]; if(Math.hypot(pt[0]-last[0],pt[1]-last[1])<0.4) return; const pr=cur.pr?Math.round((ev.pressure||.5)*100)/100:undefined; const np=[pt[0],pt[1],pr]; inkStroke(g,{c:cur.c,w:cur.w,pr:cur.pr,p:[last,np]}); cur.p.push(np); });
+  });
+  const end=e=>{ if(!cur) return; if(erasing){ if(cur.erased){ INK_UI.redo=[]; commit(); } erasing=false; cur=null; return; }
+    if(cur.p.length){ cur.p=cur.p.map(q=>q[2]==null?[q[0],q[1]]:q); page.strokes.push(cur); INK_UI.redo=[]; commit(); } cur=null; };
+  cv.addEventListener("pointerup",end); cv.addEventListener("pointercancel",end); cv.addEventListener("lostpointercapture",end);
+  cv.addEventListener("contextmenu",e=>e.preventDefault());
+}
+function inkPngBlob(page,cb){
+  const sc=2, cv=document.createElement("canvas"); cv.width=INK_W*sc; cv.height=page.h*sc; const g=cv.getContext("2d"); g.setTransform(sc,0,0,sc,0,0);
+  g.fillStyle="#fffdf6"; g.fillRect(0,0,INK_W,page.h); inkPaper(g,page,"rgba(120,120,120,.30)"); page.strokes.forEach(s=>inkStroke(g,s,"#1a1a1a"));
+  cv.toBlob(cb,"image/png");
+}
+function inkFile(page,i){ return String(i+1).padStart(2,"0")+"_"+inkPageName(page).replace(/[^\w\-]+/g,"_")+".png"; }
+function inkExportPng(page){ inkPngBlob(page,b=>{ if(b) download(inkFile(page,INK.pages.indexOf(page)),b,"image/png"); }); }
+function inkExportAll(){ INK.pages.forEach((p,i)=>setTimeout(()=>inkPngBlob(p,b=>{ if(b) download(inkFile(p,i),b,"image/png"); }),i*600)); toast("🖼 "+INK.pages.length+" "+T2("Seiten werden als PNG gespeichert","pages are saved as PNG")); }
+function inkView(){
+  const wrap=h("div",{}), page=inkCur(); if(page) INK_UI.sel=page.id; const idx=page?INK.pages.indexOf(page):-1, n=INK.pages.length;
+  const goto=i=>{ const p=INK.pages[i]; if(p){ INK_UI.sel=p.id; INK_UI.redo=[]; render(); window.scrollTo(0,0); } };
+  const head=h("div",{class:"card"});
+  head.appendChild(h("div",{class:"row",style:"gap:8px;flex-wrap:wrap;align-items:center"},h("h2",{style:"margin:0"},"✍ "+T2("Handnotizen","Handwritten notes")),h("span",{class:"space"}),
+    n?h("button",{class:"btn btn-sm",disabled:idx<=0,title:T2("Vorherige Seite","Previous page"),onclick:()=>goto(idx-1)},"◀"):null,
+    n?h("select",{style:"width:auto;max-width:240px",title:T2("Seite wählen","Choose a page"),onchange:e=>{ INK_UI.sel=e.target.value; INK_UI.redo=[]; render(); }},...INK.pages.map((p,i)=>h("option",{value:p.id,selected:page&&p.id===page.id},(i+1)+"/"+n+" · "+inkPageName(p)))):null,
+    n?h("button",{class:"btn btn-sm",disabled:idx>=n-1,title:T2("Nächste Seite","Next page"),onclick:()=>goto(idx+1)},"▶"):null,
+    h("button",{class:"btn btn-primary btn-sm",onclick:()=>{ const p=inkNew(); INK.pages.push(p); INK_UI.sel=p.id; INK_UI.redo=[]; saveInk(); render(); }},"＋ "+T2("Neue Seite","New page"))));
+  wrap.appendChild(head);
+  if(!page){ wrap.appendChild(h("div",{class:"card",style:"margin-top:10px"},h("p",{class:"muted"},T2("Noch keine Seite – mit „＋ Neue Seite“ anlegen. Dann kannst du mit dem Stift (oder Finger / Maus) direkt auf die Seite schreiben und zeichnen.","No page yet – create one with “＋ New page”. Then write and draw straight onto the page with the pen (or finger / mouse).")))); return wrap; }
+  const sessOpts=[["",T2("— keine Session —","— no session —")],...SLOG.sessions.slice().sort((a,b)=>Number(b.nr)-Number(a.nr)).map(s=>[String(s.id),"Session "+s.nr+(s.date?" ("+s.date+")":"")+(s.title?" – "+s.title:"")])];
+  head.appendChild(h("div",{class:"row",style:"gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px"},
+    h("input",{type:"text",value:page.title||"",placeholder:T2("Titel (optional)","Title (optional)"),style:"flex:1;min-width:160px",onchange:e=>{ page.title=e.target.value.trim(); page.upd=Date.now(); saveInk(); render(); }}),
+    h("select",{style:"width:auto;max-width:240px",title:T2("Zu einer Session des Spiellogs zuordnen","Link to a session of the session log"),onchange:e=>{ page.session=e.target.value; saveInk(); }},...sessOpts.map(([v,l])=>h("option",{value:v,selected:String(page.session||"")===v},l))),
+    h("select",{style:"width:auto",onchange:e=>{ page.paper=e.target.value; saveInk(); render(); }},...[["lined",T2("Liniert","Lined")],["grid",T2("Kariert","Grid")],["blank",T2("Leer","Blank")]].map(([v,l])=>h("option",{value:v,selected:(page.paper||"lined")===v},l)))));
+  const tb=h("div",{class:"ink-bar"});
+  const tbtn=(label,on,cb,title)=>h("button",{class:"btn btn-sm"+(on?" btn-primary":""),title:title||"",onclick:cb},label);
+  tb.appendChild(tbtn("✏ "+T2("Stift","Pen"),INK_UI.mode==="draw"&&INK_UI.tool==="pen",()=>{ INK_UI.tool="pen"; INK_UI.mode="draw"; render(); }));
+  tb.appendChild(tbtn("🧽 "+T2("Radierer","Eraser"),INK_UI.mode==="draw"&&INK_UI.tool==="eraser",()=>{ INK_UI.tool="eraser"; INK_UI.mode="draw"; render(); },T2("Streicht ganze Striche weg, die du berührst","Removes whole strokes you touch")));
+  tb.appendChild(tbtn("✋ "+T2("Scrollen","Scroll"),INK_UI.mode==="scroll",()=>{ INK_UI.mode=INK_UI.mode==="scroll"?"draw":"scroll"; render(); },T2("Mit dem Finger die Seite verschieben, ohne zu zeichnen","Move the page with a finger without drawing")));
+  INK_COLORS.forEach(([c,l])=>tb.appendChild(h("button",{class:"ink-col"+(INK_UI.color===c?" on":""),title:c==="auto"?T2("Automatisch (Textfarbe des Farbschemas)","Automatic (text colour of the theme)"):c,style:c==="auto"?"":"background:"+c,onclick:()=>{ INK_UI.color=c; INK_UI.tool="pen"; INK_UI.mode="draw"; render(); }},l)));
+  [[0,T2("dünn","thin")],[1,T2("mittel","medium")],[2,T2("dick","thick")]].forEach(([i,l])=>tb.appendChild(tbtn(l,INK_UI.size===i&&INK_UI.tool==="pen",()=>{ INK_UI.size=i; INK_UI.tool="pen"; INK_UI.mode="draw"; render(); })));
+  // zoom: write smaller by zooming in
+  const zi=Math.max(0,INK_ZOOMS.indexOf(INK_UI.zoom)), box=h("div",{class:"ink-page"+(INK_UI.mode==="scroll"?" scroll":"")+(INK_UI.tool==="eraser"?" eraser":"")});
+  const cv=h("canvas",{class:"ink-cv"});
+  const zlab=h("span",{class:"small",style:"min-width:44px;text-align:center;font-weight:600"},Math.round(INK_UI.zoom*100)+" %");
+  const setZoom=z=>{ z=Math.max(0,Math.min(INK_ZOOMS.length-1,z)); const old=cv.clientWidth||1, oldH=cv.clientHeight||1, top=box.getBoundingClientRect().top+window.scrollY;
+    const fx=(box.scrollLeft+box.clientWidth/2)/old, fy=(window.scrollY+window.innerHeight/2-top)/oldH; INK_UI.zoom=INK_ZOOMS[z]; zlab.textContent=Math.round(INK_UI.zoom*100)+" %"; inkRepaint(cv,page);
+    box.scrollLeft=fx*cv.clientWidth-box.clientWidth/2; window.scrollTo(0,top+fy*cv.clientHeight-window.innerHeight/2); };
+  tb.appendChild(h("span",{class:"ink-zoom"},h("button",{class:"btn btn-sm",title:T2("Verkleinern","Zoom out"),disabled:zi<=0,onclick:()=>setZoom(INK_ZOOMS.indexOf(INK_UI.zoom)-1)},"🔍−"),zlab,h("button",{class:"btn btn-sm",title:T2("Vergrößern – dann kannst du kleiner schreiben","Zoom in – then you can write smaller"),disabled:zi>=INK_ZOOMS.length-1,onclick:()=>setZoom(INK_ZOOMS.indexOf(INK_UI.zoom)+1)},"🔍+")));
+  tb.appendChild(h("span",{class:"space"}));
+  tb.appendChild(tbtn("↶",false,()=>{ const s=page.strokes.pop(); if(s){ INK_UI.redo.push(s); page.upd=Date.now(); saveInk(); render(); } },T2("Letzten Strich zurücknehmen","Undo last stroke")));
+  tb.appendChild(tbtn("↷",false,()=>{ const s=INK_UI.redo.pop(); if(s){ page.strokes.push(s); page.upd=Date.now(); saveInk(); render(); } },T2("Wiederholen","Redo")));
+  tb.appendChild(tbtn("⤓ "+T2("Länger","Longer"),false,()=>{ page.h+=600; page.upd=Date.now(); saveInk(); render(); },T2("Die Seite nach unten verlängern","Make the page longer")));
+  tb.appendChild(tbtn("🖼 PNG",false,()=>inkExportPng(page),T2("Diese Seite als Bild speichern","Save this page as an image")));
+  if(n>1) tb.appendChild(tbtn("🖼 "+T2("Alle","All"),false,inkExportAll,T2("Alle Seiten als einzelne PNG-Bilder speichern","Save all pages as separate PNG images")));
+  tb.appendChild(h("button",{class:"btn btn-sm btn-danger",title:T2("Alle Striche dieser Seite löschen","Delete all strokes of this page"),onclick:()=>askYes(T2("Alle Striche dieser Seite löschen?","Delete all strokes of this page?"),()=>{ page.strokes=[]; INK_UI.redo=[]; page.upd=Date.now(); saveInk(); render(); })},"🗑 "+T2("Leeren","Clear")));
+  tb.appendChild(h("button",{class:"btn btn-sm btn-danger",title:T2("Die ganze Seite löschen","Delete the whole page"),onclick:()=>askYes(T2("Die Seite „"+inkPageName(page)+"“ ganz löschen?","Delete the page “"+inkPageName(page)+"” completely?"),()=>{ INK.pages=INK.pages.filter(p=>p.id!==page.id); INK_UI.sel=""; INK_UI.redo=[]; saveInk(); render(); })},"✕"));
+  wrap.appendChild(h("div",{class:"ink-sticky"},tb));
+  box.appendChild(cv); wrap.appendChild(box);
+  requestAnimationFrame(()=>{ inkRepaint(cv,page); inkAttach(cv,page,null); if(window.ResizeObserver){ let t=null; new ResizeObserver(()=>{ clearTimeout(t); t=setTimeout(()=>{ if(cv.isConnected) inkRepaint(cv,page); },120); }).observe(box); } });
+  wrap.appendChild(h("p",{class:"small muted",style:"margin:6px 2px"},T2("Die Striche werden automatisch gespeichert (und mit dem Online-Abgleich gesichert). Beim Stift zählt der Druck. Mit 🔍+ vergrößerst du die Seite, um kleiner zu schreiben; „✋ Scrollen“ verschiebt die Seite mit dem Finger. Mit ◀ ▶ blätterst du zwischen den Seiten.","Strokes are saved automatically (and backed up by the online sync). The pen's pressure counts. Use 🔍+ to zoom in and write smaller; “✋ Scroll” moves the page with a finger. Use ◀ ▶ to turn pages.")));
+  return wrap;
+}
+
+(function initInk(){ const b=document.getElementById("btnInk"); if(b) b.addEventListener("click",()=>{ state.view=state.view==="ink"?null:"ink"; render(); }); })();
 (function initBooks(){ const bt=document.getElementById("btnBooks"); if(bt) bt.addEventListener("click",()=>{ state.view=state.view==="books"?null:"books"; render(); });
   const q=document.getElementById("btnQualfa"); if(q) q.addEventListener("click",()=>{ state.view=state.view==="diary"?null:"diary"; render(); }); })();
 function seedCharacters(){
